@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Log in · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <form class="card login-card" method="post" action="{{ url_for('auth.login') }}">
+    <div class="brand-mark large">ETE</div>
+    <h1 class="login-title">Service Catalog</h1>
+    <p class="login-sub">Sign in to manage the ETE catalog</p>
+
+    <label class="field">
+      <span class="field-label">Username</span>
+      <input type="text" name="username" autocomplete="username" required autofocus>
+    </label>
+
+    <label class="field">
+      <span class="field-label">Password</span>
+      <input type="password" name="password" autocomplete="current-password" required>
+    </label>
+
+    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+  </form>
+</div>
+{% endblock %}

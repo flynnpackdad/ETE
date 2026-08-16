@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETE – IT Service Catalog 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gl-orange: #FF8300;
+  --gl-yellow: #F7B334;
+  --gl-white: #FFFFFF;
+  --gl-passion: #200F51;
+  --gl-grape: #472BA4;
+  --gl-lilac: #D1C1FF;
+  --gl-bg-gradient: radial-gradient(ellipse at top right, #6B1800 0%, #3A0D5C 25%, #200F51 60%, #0A0620 100%);
+  --gl-card-bg: rgba(255,255,255,0.06);
+  --gl-card-border: 1.5px solid rgba(209,193,255,0.25);
+  --gl-font-headline: 'Montserrat', 'Arial Black', sans-serif;
+  --gl-font-body: 'Nunito', 'Helvetica Neue', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #0A0620;
+  color: var(--gl-white);
+  font-family: var(--gl-font-body);
+  overflow: hidden;
+  user-select: none;
+}
+
+.deck {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: var(--gl-bg-gradient);
+  display: flex;
+  flex-direction: column;
+  padding: 44px 56px 76px;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+.slide.exit-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  pointer-events: none;
+}
+
+/* ── Progress bar ─────────────────────────── */
+#progressBar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gl-orange), var(--gl-yellow));
+  transition: width 0.3s ease;
+  z-index: 200;
+}
+
+/* ── Bottom nav ───────────────────────────── */
+.nav {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 200;
+  background: rgba(10,6,32,0.88);
+  border: 1px solid rgba(209,193,255,0.18);
+  border-radius: 40px;
+  padding: 8px 18px;
+  backdrop-filter: blur(14px);
+}
+
+.nav button {
+  background: none;
+  border: none;
+  color: var(--gl-lilac);
+  cursor: pointer;
+  font-size: 16px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.nav button:hover { background: rgba(255,131,0,0.18); color: var(--gl-orange); }
+
+.slide-counter {
+  font-family: var(--gl-font-body);
+  font-size: 12px;
+  color: rgba(209,193,255,0.65);
+  min-width: 52px;
+  text-align: center;
+}
+
+/* Jump-to dots */
+.dot-nav {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  z-index: 200;
+}
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(209,193,255,0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dot.active { background: var(--gl-orange); transform: scale(1.5); }
+.dot:hover { background: var(--gl-lilac); }
+
+/* ── Typography ───────────────────────────── */
+h1 { font-family: var(--gl-font-headline); font-size: 58px; font-weight: 800; line-height: 1.0; }
+h2 { font-family: var(--gl-font-headline); font-size: 28px; font-weight: 700; }
+h3 { font-family: var(--gl-font-headline); font-size: 16px; font-weight: 700; }
+
+.accent { color: var(--gl-orange); }
+.lilac  { color: var(--gl-lilac); }
+
+.section-label {
+  font-family: var(--gl-font-headline);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gl-lilac);
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+/* ── Cards ────────────────────────────────── */
+.card {
+  background: var(--gl-card-bg);
+  border: var(--gl-card-border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.card-accent {
+  background: rgba(255,131,0,0.07);
+  border: 1.5px solid rgba(255,131,0,0.35);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+/* ── Stat callouts ────────────────────────── */
+.stat { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.stat .value {
+  font-family: var(--gl-font-headline);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--gl-orange);
+}
+.stat .label { font-size: 13px; color: var(--gl-lilac); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+
+/* ── Service badge ────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--gl-grape), var(--gl-orange));
+  border-radius: 10px;
+  font-family: var(--gl-font-headline);
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* ── Tags / pills ─────────────────────────── */
+.tag {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(71,43,164,0.45);
+  color: var(--gl-lilac);
+  border: 1px solid rgba(209,193,255,0.18);
+}
+
+.pill-ops      { background: rgba(255,131,0,0.14); color: #FF8300; border: 1px solid rgba(255,131,0,0.28); }
+.pill-infra    { background: rgba(71,43,164,0.28); color: var(--gl-lilac); border: 1px solid rgba(209,193,255,0.18); }
+.pill-prod     { background: rgba(0,150,210,0.14); color: #60D0FF; border: 1px solid rgba(0,150,210,0.28); }
+.pill-ancillary{ background: rgba(247,179,52,0.14); color: #F7B334; border: 1px solid rgba(247,179,52,0.28); }
+
+/* ── List items ───────────────────────────── */
+.li {
+  display: flex; align-items: flex-start; gap: 7px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.82);
+}
+.li::before { content: '›'; color: var(--gl-orange); font-weight: 700; flex-shrink: 0; margin-top: 0px; }
+
+/* ── Internal stamp ───────────────────────── */
+.stamp {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #2C2B27;
+  color: rgba(209,193,255,0.7);
+  text-align: center;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-family: var(--gl-font-body);
+  letter-spacing: 1px;
+  z-index: 9999;
+  opacity: 0.9;
+}
+
+/* ── Section-header slide ─────────────────── */
+.section-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.hero-number {
+  font-family: var(--gl-font-headline);
+  font-size: 160px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.04);
+  line-height: 1;
+  position: absolute;
+  right: 48px;
+  bottom: 60px;
+}
+</style>
+</head>
+<body>
+
+<div id="progressBar"></div>
+<div class="dot-nav" id="dotNav"></div>
+
+<div class="deck" id="deck"></div>
+
+<div class="nav">
+  <button onclick="prevSlide()" title="Previous (←)">&#8592;</button>
+  <span class="slide-counter" id="slideCounter">1 / 1</span>
+  <button onclick="nextSlide()" title="Next (→)">&#8594;</button>
+</div>
+
+<div class="stamp">INTERNAL USE ONLY — Not approved for customer-facing distribution</div>
+
+<script>
+// ================================================================
+//  DATA CONFIGURATION
+//  ─────────────────────────────────────────────────────────────
+//  All dollar amounts and FTE counts are defined here.
+//  To connect a live data source, replace the static values with
+//  an async fetch, e.g.:
+//
+//    async function loadLiveData() {
+//      const res = await fetch('/api/it-service-catalog/run-rate');
+//      const json = await res.json();
+//      DATA.services.forEach(s => {
+//        const live = json.services.find(x => x.id === s.id);
+//        if (live) { s.vendorSpend = live.vendorSpend; s.ftes = live.ftes; }
+//      });
+//      DATA.vendorSpend.itOps.amount      = json.totals.itOpsVendor;
+//      DATA.vendorSpend.itEngineering.amount = json.totals.itEngVendor;
+//      DATA.headcount.itOps.ftes          = json.totals.itOpsFTEs;
+//      DATA.headcount.itEngineering.ftes  = json.totals.itEngFTEs;
+//      renderSlides();
+//    }
+//    loadLiveData();
+//
+// ================================================================
+const DATA = {
+
+  // Source: ETE Service Costs.xlsx — Planning/ (OneDrive)
+  // TotalCost table → vendorSpend | Labor table → laborCost, ftes (employee), contractorFtes
+  dataSource: 'ETE Service Costs.xlsx',
+  dataSourceUrl: 'https://paramountequity0-my.sharepoint.com/personal/cflynn_goodleap_com/Documents/Planning/ETE%20Service%20Costs.xlsx',
+
+  headcount: {
+    executive:    { count: 1 },
+    itOps:        { ftes: 12.25, count: 11, label: 'IT Service Desk (Ops)' },
+    itEngineering:{ ftes: 3.75,  count: 4,  label: 'IT Engineering' },
+    contractors:  { ftes: 8.0,   label: 'Contractor FTEs' },
+    empCount: 16
+  },
+
+  vendorSpend: {
+    itOps:        { amount: 1634875.93, label: 'IT Service Desk Vendor' },
+    itEngineering:{ amount: 6647621.24, label: 'IT Engineering Vendor' }
+  },
+
+  services: [
+    {
+      id: 1, category: 'ops', owner: 'Abel', department: 'IT Service Desk',
+      name: 'Laptop & Hardware Services',
+      ftes: 2.6, contractorFtes: 0, vendorSpend: 1352602, laborCost: 406185.36,
+      description: 'Employee Technology Enablement provisions and supports a selection of standardized laptops and desktops for employees to perform their daily business functions. Both Windows and Apple options are available along with standard accessories.',
+      costDrivers: [
+        'Number of new hires & contractors',
+        'Fleet replacement cycles',
+        'MacOS vs. Windows mix',
+        'Lost/stolen equipment',
+        'Ability to automate image/refresh',
+        'Geographies supported',
+        'Desktop vs. laptop mix'
+      ],
+      deliverables: [
+        'New hire & contractor setups',
+        'Windows & Apple refresh/rebuild',
+        'Hardware & OS-level troubleshooting',
+        'Accessory provisioning (keyboards, mice, monitors, docking stations, headsets)'
+      ],
+      tools: ['Dell 5550 / 3500', 'Lenovo X1 Carbon', 'MacBook Air / Pro', 'Windows 11', 'macOS Monterey+', 'Kandji', 'InTune']
+    },
+    {
+      id: 2, category: 'ops', owner: 'Abel', department: 'IT Service Desk',
+      name: 'Service Desk & Concierge Services',
+      ftes: 9.65, contractorFtes: 0, vendorSpend: 180264, laborCost: 976652.54,
+      description: 'ETE provides support services via online, email, and in-person channels. Live personnel 8:00 AM – 6:00 PM Mon–Fri, 9:00–12:00 Saturdays. All assistance tracked via ticketing system with established SLAs.',
+      costDrivers: [
+        'Pace of growth for user base',
+        'Number of locations requiring support',
+        'Remote vs. onsite user base ratio',
+        'Amount of hardware & applications supported',
+        'Remote control tool licenses',
+        'Agreed user ratio: 150/1'
+      ],
+      deliverables: [
+        'Live support M–F 8am–6pm, Sat 9am–12pm',
+        'Tier 1 mortgage support',
+        'Ticket intake, management & SLA tracking',
+        'Remote & onsite troubleshooting'
+      ],
+      tools: ['Jira Service Management', 'Rovo', 'PagerDuty', 'BeyondTrust (Bomgar)', 'Slack']
+    },
+    {
+      id: 3, category: 'infra', owner: 'EverOps (Mike)', department: 'IT Engineering',
+      name: 'Internet, Networking & VPN Services',
+      ftes: 0.1, contractorFtes: 1.5, vendorSpend: 837855, laborCost: 43125.03,
+      description: 'Supports both on-prem and SaaS solutions from a technology delivery perspective. Manages stability, redundancy and capacity of internet and network connections, firewalls, and switches at datacenters and each managed site.',
+      costDrivers: [
+        'Need to exit the cabling business',
+        'Improve internal network security posture',
+        'Consolidate VPN appliance & secure auth',
+        'Wi-Fi platform settings standardization',
+        'User/group-based firewall security rules needed',
+        'Lack of per-office Wi-Fi sensors'
+      ],
+      deliverables: [
+        'Palo Alto firewall management',
+        'Wi-Fi infrastructure (Meraki)',
+        'Corporate VPN access & management',
+        'Circuit/bandwidth management',
+        'Network monitoring & incident response'
+      ],
+      tools: ['Palo Alto Networks', 'Panorama', 'Meraki APs & Cameras', 'Meraki Switches', 'Aruba/HP Switches', 'Aruba Central', 'SecureW2 PKI']
+    },
+    {
+      id: 4, category: 'infra', owner: 'EverOps (Mike)', department: 'IT Engineering',
+      name: 'Accounts, Passwords & App Access',
+      ftes: 0.1, contractorFtes: 2.0, vendorSpend: 663341, laborCost: 43125.03,
+      description: 'Identity Management ensures the right people get access to the right resources at the right time. Cornerstone of application access, network access, and admin privileges. Supports regulatory compliance including SOX.',
+      costDrivers: [
+        'Many app vendors without SSO support',
+        'Limited automation for onboarding/offboarding',
+        'Legacy AD as identity master limits Okta automation',
+        'Inaccurate user data in IDP (employee ID, team)',
+        'Need for comprehensive IGA capabilities',
+        'Inconsistent app assignment methods in Okta'
+      ],
+      deliverables: [
+        'User provisioning & deprovisioning',
+        'SSO & adaptive MFA management',
+        'App access request handling (self-service)',
+        'Okta Workflows automation',
+        'Identity governance & access reporting'
+      ],
+      tools: ['Okta Universal Directory', 'Okta Workflows', 'Okta Adaptive MFA', 'Okta OIG', 'CrowdStrike Identity', 'Active Directory', 'Microsoft Entra', '1Password']
+    },
+    {
+      id: 5, category: 'infra', owner: 'EverOps (Mike)', department: 'IT Engineering',
+      name: 'Security & Safe Computing',
+      ftes: 0.1, contractorFtes: 2.0, vendorSpend: 722077, laborCost: 43125.03,
+      description: 'As a FinTech company it is critical for GoodLeap to have its production environment fortified and up-to-date when it comes to protecting data, endpoints, email, and other areas of potential vulnerability.',
+      costDrivers: [
+        'Limited Kandji reporting for audit & compliance',
+        'Deep IT Security skillsets not on staff',
+        'Reactive-only approach to CrowdStrike alerts',
+        'Manual security metrics lacking historical trending',
+        'Zoom Rooms not managed by MDM',
+        'Windows AD integration prevents zero-touch ship'
+      ],
+      deliverables: [
+        'Endpoint security management (CrowdStrike)',
+        'MDM management (Kandji + InTune)',
+        'Patch management & compliance reporting',
+        'Security incident response',
+        'Managed SOC via CrowdStrike Falcon Complete'
+      ],
+      tools: ['CrowdStrike Endpoint Security', 'CrowdStrike Falcon Complete (SOC)', 'CrowdStrike Falcon Firewall', 'InTune', 'Kandji', 'Patch My PC']
+    },
+    {
+      id: 6, category: 'infra', owner: 'EverOps (Mike)', department: 'IT Engineering',
+      name: 'Data Center Hosting',
+      ftes: 0.1, contractorFtes: 0.5, vendorSpend: 478800, laborCost: 43125.03,
+      description: 'Provides a secure, reliable environment of space, power, cooling and physical security for computing, network and storage. Consists of 2 physical datacenters (QTS) plus the Amazon AWS environment.',
+      costDrivers: [
+        'Physical datacenters require greater equipment overhead',
+        'Need to exit the hardware management business',
+        'Less financially flexible vs. cloud',
+        'ETE AWS environment sprawl adds overhead',
+        'IaC-based architecture not yet in place',
+        'R53 DNS is click-ops — needs IaC migration'
+      ],
+      deliverables: [
+        'AWS infrastructure management',
+        'Physical datacenter operations (QTS Sacramento/Dallas)',
+        'DR architecture planning & table-top exercises',
+        'IaC-driven cloud architecture rollout',
+        'Virtual server management (HyperV)'
+      ],
+      tools: ['AWS (EC2, Transit Gateways)', 'Palo Alto Virtual Firewalls', 'Azure', 'QTS Datacenters', 'HyperV', 'IaC tooling']
+    },
+    {
+      id: 7, category: 'prod', owner: 'Christopher', department: 'IT Engineering',
+      name: 'Unified Communications Services',
+      ftes: 0.85, contractorFtes: 2.0, vendorSpend: 3278441, laborCost: 177675.03,
+      description: 'Provides internal and external voice communications for employees and contingent workers via physical desk phones and softphones. Managed through Genesys Cloud and Zoom for all voice, video, and fax needs.',
+      costDrivers: [
+        'Number of Loan Officers, Collections & CFA agents',
+        'Number of Customer Care Advisors',
+        'Required DID and toll-free numbers',
+        'Third-party reporting solution requirements',
+        'Middleware platform consolidation complexity'
+      ],
+      deliverables: [
+        'Call routing & queue management (Genesys)',
+        'Physical desk phones & softphones',
+        'Call escalation & voicemail management',
+        'Video conferencing (Zoom & Zoom Rooms)',
+        'Fax services (Genesys Cloud / SRFax)',
+        'New extension setup'
+      ],
+      tools: ['Genesys Cloud', 'Genesys WFM', 'Azure Middleware', 'AWS Middleware', 'PureInsights', 'IntelePeer', 'IntelePeer Reputation ID', 'Zoom', 'Zoom Rooms', 'SRFax']
+    },
+    {
+      id: 8, category: 'prod', owner: 'Christopher', department: 'IT Engineering',
+      name: 'Email & Messaging Services',
+      ftes: 1.0, contractorFtes: 0, vendorSpend: 156671, laborCost: 221325.03,
+      description: 'Encompasses safe delivery of email, company calendaring and instant messaging across the entire organization. Manages both internal and external communication capabilities with DLP and compliance controls.',
+      costDrivers: [
+        'Number of FTEs and contractors',
+        'Slack add-ons and third-party integrations',
+        'Volume of emails processed daily',
+        'Mail routing complexity'
+      ],
+      deliverables: [
+        'Microsoft O365 support with DLP',
+        'Anti-phishing & spam filtering (Mimecast)',
+        'Distribution list admin & mailbox creation',
+        'Slack Grid administration',
+        'Email archiving (Barracuda)',
+        'Phishing awareness training (Proofpoint)'
+      ],
+      tools: ['Office 365', 'Mimecast', 'Slack Grid', 'Zoom Chat', 'Exclaimer', 'Barracuda Archiver', 'Dmarcian', 'Proofpoint']
+    },
+    {
+      id: 9, category: 'prod', owner: 'Christopher', department: 'IT Engineering',
+      name: 'File Sharing & Document Collaboration',
+      ftes: 1.0, contractorFtes: 0, vendorSpend: 1000813, laborCost: 221325.03,
+      description: 'Creating and sharing documents across teams is critical for GoodLeap. Different teams have different needs, so we offer a variety of solutions — from OneDrive for everyday storage to Smartsheet for project tracking.',
+      costDrivers: [
+        'Multiple document sharing platforms in portfolio',
+        'Security for on-premises solutions',
+        'Duplicate access management (internal vs. external)',
+        'Point solutions for specialized business areas',
+        'Confluence add-ons'
+      ],
+      deliverables: [
+        'On-prem file server admin & data backup (Synology)',
+        'SharePoint & OneDrive admin with DLP',
+        'LucidChart access management',
+        'Smartsheet access management',
+        'Adobe Creative Cloud admin',
+        'Confluence access requests'
+      ],
+      tools: ['Synology', 'SharePoint', 'OneDrive', 'LucidChart', 'Smartsheet', 'Adobe Creative Cloud', 'Confluence']
+    },
+    {
+      id: 10, category: 'ancillary', owner: 'Christopher', department: 'IT Engineering',
+      name: 'Ancillary IT Services',
+      ftes: 0.5, contractorFtes: 0, vendorSpend: 523200, laborCost: 118950.05,
+      description: 'Collection of services that don\'t fit the larger buckets but are vital to GoodLeap operations — combining end-user services like printing with business-critical operations like Capital Markets SFTP support.',
+      costDrivers: [
+        'Certificate management lifecycle overhead',
+        'Capital Markets SFTP connection complexity',
+        'Legal & compliance discovery request volume',
+        'E-recycling & asset disposal compliance'
+      ],
+      deliverables: [
+        'Printing infrastructure (Ubeo)',
+        'SSL/TLS certificate management',
+        'E-recycling & asset disposal record-keeping',
+        'Capital Markets SFTP connections to banks',
+        'Legal & compliance email searches',
+        'End-user training (O365, Slack, Genesys)',
+        'Freshdesk administration'
+      ],
+      tools: ['GoDaddy', 'Ubeo (Printing)', 'SFTP', 'Freshdesk']
+    }
+  ]
+};
+
+// ================================================================
+// HELPERS
+// ================================================================
+const catMeta = {
+  ops:       { label: 'Operations & Support',       pill: 'pill-ops'      },
+  infra:     { label: 'Infrastructure & Security',  pill: 'pill-infra'    },
+  prod:      { label: 'Productivity Services',       pill: 'pill-prod'     },
+  ancillary: { label: 'Ancillary Services',          pill: 'pill-ancillary'}
+};
+
+function fmt(n) {
+  return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+function fmtFull(n) {
+  return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function catPill(cat, extra) {
+  const m = catMeta[cat];
+  return `<span class="tag ${m.pill}" style="${extra||''}">${m.label}</span>`;
+}
+
+// ================================================================
+// SLIDE BUILDERS
+// ================================================================
+
+function slideTitle() {
+  const empFTE = DATA.headcount.itOps.ftes + DATA.headcount.itEngineering.ftes;
+  const totalFTE = empFTE + DATA.headcount.contractors.ftes;
+  const totalVendor = DATA.services.reduce((a,s) => a + s.vendorSpend, 0);
+  const totalLabor = DATA.services.reduce((a,s) => a + s.laborCost, 0);
+  const grandTotal = totalVendor + totalLabor;
+  return `
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:4px;">
+        <div style="width:40px;height:3px;background:linear-gradient(90deg,#FF8300,#F7B334);border-radius:2px;"></div>
+        <span style="font-family:var(--gl-font-headline);font-size:11px;letter-spacing:3px;color:var(--gl-lilac);text-transform:uppercase;opacity:0.8;">GoodLeap · Employee Technology Enablement · 2026</span>
+      </div>
+      <h1>IT <span class="accent">Service</span><br>Catalog</h1>
+      <p style="font-size:16px;color:rgba(255,255,255,0.65);max-width:460px;line-height:1.6;">
+        A guide to services provided by the ETE team — infrastructure, support, productivity, and beyond.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+        ${['Operations & Support','Infrastructure & Security','Productivity Services','Ancillary Services'].map(c =>
+          `<span class="tag" style="font-size:11px;padding:4px 12px;">${c}</span>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:28px;padding-top:20px;border-top:1px solid rgba(209,193,255,0.12);">
+      <div class="stat">
+        <span class="value">${DATA.headcount.empCount}</span>
+        <span class="label">Employees · ${DATA.headcount.contractors.ftes} Contractor FTEs</span>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+      <div class="stat">
+        <span class="value">${DATA.services.length}</span>
+        <span class="label">Services</span>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+      <div class="stat">
+        <span class="value" style="font-size:20px;">${fmt(totalVendor)}</span>
+        <span class="label">Vendor Spend</span>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+      <div class="stat">
+        <span class="value" style="font-size:20px;">${fmt(grandTotal)}</span>
+        <span class="label">Total Run Rate</span>
+      </div>
+    </div>`;
+}
+
+function slideOverview() {
+  const groups = [
+    { key:'ops',       label:'OPERATIONS & SUPPORT' },
+    { key:'infra',     label:'INFRASTRUCTURE & SECURITY' },
+    { key:'prod',      label:'PRODUCTIVITY SERVICES' },
+    { key:'ancillary', label:'ANCILLARY SERVICES' }
+  ];
+
+  return `
+    <div style="margin-bottom:20px;">
+      <div class="section-label">Service Catalog</div>
+      <h2>ETE – <span class="accent">All Services</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;flex:1;">
+      ${groups.map(g => {
+        const svcs = DATA.services.filter(s => s.category === g.key);
+        const total = svcs.reduce((a,s) => a + s.vendorSpend + s.laborCost, 0);
+        return `
+          <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+            <span class="tag ${catMeta[g.key].pill}" style="align-self:flex-start;font-size:12px;padding:5px 12px;letter-spacing:.5px;">${g.label}</span>
+            ${svcs.map(s => `
+              <div style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;padding:8px;border-radius:8px;transition:background .15s;"
+                   onmouseover="this.style.background='rgba(255,255,255,0.05)'"
+                   onmouseout="this.style.background=''"
+                   onclick="goToService(${s.id})">
+                <div class="badge" style="width:26px;height:26px;min-width:26px;font-size:12px;border-radius:7px;">${s.id}</div>
+                <div>
+                  <div style="font-size:14px;font-weight:700;line-height:1.3;color:#fff;">${s.name}</div>
+                  <div style="font-size:12px;color:var(--gl-lilac);margin-top:3px;">${s.ftes + (s.contractorFtes||0)} FTE &nbsp;·&nbsp; ${fmt(s.vendorSpend + s.laborCost)}</div>
+                </div>
+              </div>`).join('')}
+            <div style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,0.07);display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:rgba(255,255,255,0.4);">Run Rate</span>
+              <span style="font-size:15px;font-family:var(--gl-font-headline);font-weight:700;color:var(--gl-orange);">${fmt(total)}</span>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function slideFinancials() {
+  const totalVendor  = DATA.services.reduce((a,s) => a + s.vendorSpend, 0);
+  const totalLabor   = DATA.services.reduce((a,s) => a + s.laborCost, 0);
+  const grandTotal   = totalVendor + totalLabor;
+  const totalEmpFTE  = DATA.headcount.itOps.ftes + DATA.headcount.itEngineering.ftes;
+  const totalFTE     = totalEmpFTE + DATA.headcount.contractors.ftes;
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;">
+      <div>
+        <div class="section-label">Financial Summary · Source: ETE Service Costs.xlsx</div>
+        <h2>ETE – IT <span class="accent">Run Rate</span></h2>
+      </div>
+      <div style="display:flex;gap:20px;">
+        <div class="stat"><span class="value">${DATA.headcount.empCount}</span><span class="label">Employees · ${DATA.headcount.contractors.ftes} Contractor FTEs</span></div>
+        <div class="stat"><span class="value" style="font-size:18px;">${fmt(totalVendor)}</span><span class="label">Vendor</span></div>
+        <div class="stat"><span class="value" style="font-size:18px;">${fmt(totalLabor)}</span><span class="label">Labor</span></div>
+        <div class="stat"><span class="value" style="font-size:18px;color:var(--gl-yellow);">${fmt(grandTotal)}</span><span class="label">Total Run Rate</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;">
+      ${DATA.services.map(s => {
+        const total = s.vendorSpend + s.laborCost;
+        const totalFTE = s.ftes + (s.contractorFtes || 0);
+        return `
+        <div class="card" style="cursor:pointer;padding:11px 13px;transition:border-color .15s;"
+             onmouseover="this.style.borderColor='rgba(255,131,0,0.5)'"
+             onmouseout="this.style.borderColor='rgba(209,193,255,0.25)'"
+             onclick="goToService(${s.id})">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+            <div class="badge" style="width:22px;height:22px;min-width:22px;font-size:11px;border-radius:6px;">${s.id}</div>
+            <span style="font-size:13px;font-weight:700;color:var(--gl-lilac);line-height:1.25;">${s.name}</span>
+          </div>
+          <div style="font-family:var(--gl-font-headline);font-size:17px;font-weight:700;color:var(--gl-orange);">${fmt(s.vendorSpend)}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);">Vendor</div>
+          <div style="font-family:var(--gl-font-headline);font-size:15px;font-weight:600;color:var(--gl-lilac);margin-top:3px;">${fmt(s.laborCost)}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);">Labor</div>
+          <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;font-weight:700;color:var(--gl-yellow);">${totalFTE} FTE</span>
+            <span class="tag ${catMeta[s.category].pill}" style="font-size:11px;padding:3px 7px;">${s.id <= 2 ? 'OPS' : s.id <= 6 ? 'INFRA' : s.id <= 9 ? 'PROD' : 'ANC'}</span>
+          </div>
+        </div>`}).join('')}
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+      <div class="card-accent" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;text-align:center;">
+        <div class="section-label" style="margin-bottom:10px;">Executive</div>
+        <div style="font-family:var(--gl-font-headline);font-size:42px;font-weight:700;line-height:1;color:var(--gl-orange);">${DATA.headcount.executive.count}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:8px;">Employee</div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;text-align:center;">
+        <div class="section-label" style="margin-bottom:10px;">IT Service Desk (Ops)</div>
+        <div style="font-family:var(--gl-font-headline);font-size:42px;font-weight:700;line-height:1;color:var(--gl-orange);">${DATA.headcount.itOps.count}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:8px;">Employees</div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;text-align:center;">
+        <div class="section-label" style="margin-bottom:10px;">IT Engineering</div>
+        <div style="font-family:var(--gl-font-headline);font-size:42px;font-weight:700;line-height:1;color:var(--gl-orange);">${DATA.headcount.itEngineering.count}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:8px;">Employees</div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;text-align:center;">
+        <div class="section-label" style="margin-bottom:10px;">Contractors</div>
+        <div style="font-family:var(--gl-font-headline);font-size:42px;font-weight:700;line-height:1;color:var(--gl-lilac);">${DATA.headcount.contractors.ftes}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:8px;">FTEs</div>
+      </div>
+    </div>`;
+}
+
+function slideService(s) {
+  const cat = catMeta[s.category];
+  return `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div class="badge" style="width:48px;height:48px;font-size:20px;border-radius:13px;flex-shrink:0;">${s.id}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+          ${catPill(s.category)}
+          <span class="tag">Owner: ${s.owner}</span>
+          ${s.department ? `<span class="tag" style="opacity:0.7;">${s.department}</span>` : ''}
+        </div>
+        <h2 style="font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.name}</h2>
+      </div>
+      <div style="display:flex;gap:18px;flex-shrink:0;">
+        <div class="stat">
+          <span class="value">${s.ftes + (s.contractorFtes||0)}</span>
+          <span class="label">${s.ftes} Emp + ${s.contractorFtes||0} Ctr</span>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+        <div class="stat">
+          <span class="value" style="font-size:18px;">${fmt(s.vendorSpend)}</span>
+          <span class="label">Vendor Spend</span>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+        <div class="stat">
+          <span class="value" style="font-size:18px;color:var(--gl-lilac);">${fmt(s.laborCost)}</span>
+          <span class="label">Labor Cost</span>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+        <div class="stat">
+          <span class="value" style="font-size:18px;color:var(--gl-yellow);">${fmt(s.vendorSpend + s.laborCost)}</span>
+          <span class="label">Total Cost</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:grid;grid-template-columns:1.15fr 0.95fr 0.9fr;gap:12px;min-height:0;">
+      <div class="card-accent" style="display:flex;flex-direction:column;overflow:hidden;">
+        <div class="section-label" style="margin-bottom:8px;">Service Description</div>
+        <p style="font-size:14px;line-height:1.65;color:rgba(255,255,255,0.82);margin-bottom:14px;">${s.description}</p>
+        <div style="margin-top:auto;">
+          <div class="section-label" style="margin-bottom:7px;">Cost Drivers</div>
+          ${s.costDrivers.map(d => `<div class="li">${d}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+        <div class="section-label" style="margin-bottom:8px;">Service Deliverables</div>
+        ${s.deliverables.map(d => `<div class="li">${d}</div>`).join('')}
+      </div>
+
+      <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+        <div class="section-label" style="margin-bottom:8px;">Technology Stack</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          ${s.tools.map(t => `<span class="tag" style="font-size:13px;">${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function slideTechStack() {
+  const cols = [
+    {
+      cat: 'ops', title: 'OPS & SUPPORT',
+      sections: [
+        { name: 'Laptop & Hardware', tools: ['Dell 5550/3500 Series', 'Lenovo X1 Carbon', 'MacBook Air / Pro', 'Windows 11', 'macOS Monterey+', 'Kandji MDM', 'InTune', 'Patch My PC'] },
+        { name: 'Service Desk', tools: ['JSM & Rovo', 'PagerDuty', 'BeyondTrust (Bomgar)'] }
+      ]
+    },
+    {
+      cat: 'infra', title: 'INFRASTRUCTURE & SECURITY',
+      sections: [
+        { name: 'Networking & VPN', tools: ['Palo Alto Networks', 'Panorama', 'Meraki APs & Cameras', 'Meraki Switches', 'Aruba/HP Switches', 'SecureW2 PKI'] },
+        { name: 'Identity & Access', tools: ['Okta Universal Directory', 'Okta Workflows', 'Okta Adaptive MFA', 'Okta OIG', 'CrowdStrike Identity', 'Active Directory', 'Entra', '1Password'] },
+        { name: 'Security & Endpoint', tools: ['CrowdStrike Endpoint', 'Falcon Complete (SOC)', 'Falcon Firewall', 'InTune', 'Kandji', 'Patch My PC'] },
+        { name: 'Datacenter / Cloud', tools: ['AWS EC2 & Transit GW', 'Palo Alto vFirewall', 'Azure', 'QTS Sacramento/Dallas', 'HyperV', 'IaC tooling'] }
+      ]
+    },
+    {
+      cat: 'prod', title: 'PRODUCTIVITY SERVICES',
+      sections: [
+        { name: 'Unified Comms', tools: ['Genesys Cloud', 'Genesys WFM', 'IntelePeer', 'IntelePeer Reputation ID', 'Zoom', 'Zoom Rooms', 'SRFax'] },
+        { name: 'Email & Messaging', tools: ['Office 365', 'Mimecast', 'Barracuda Archiver', 'Dmarcian', 'Exclaimer', 'Slack Grid', 'Zoom Chat', 'Proofpoint'] },
+        { name: 'File & Docs', tools: ['OneDrive', 'SharePoint', 'Synology', 'LucidChart', 'Smartsheet', 'Adobe Creative Cloud', 'Confluence'] }
+      ]
+    },
+    {
+      cat: 'ancillary', title: 'ANCILLARY',
+      sections: [
+        { name: 'Ancillary Services', tools: ['GoDaddy', 'Ubeo (Printing)', 'SFTP', 'Freshdesk'] }
+      ]
+    }
+  ];
+
+  return `
+    <div style="margin-bottom:18px;">
+      <div class="section-label">Technology</div>
+      <h2>ETE <span class="accent">Tech Stack</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:0.9fr 1.6fr 1.3fr 0.7fr;gap:12px;flex:1;min-height:0;">
+      ${cols.map(col => `
+        <div class="card" style="display:flex;flex-direction:column;gap:20px;overflow:hidden;">
+          <span class="tag ${catMeta[col.cat].pill}" style="align-self:flex-start;font-size:18px;padding:6px 16px;letter-spacing:.5px;">${col.title}</span>
+          ${col.sections.map(sec => `
+            <div>
+              <div style="font-size:22px;font-weight:700;color:var(--gl-lilac);margin-bottom:8px;">${sec.name}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                ${sec.tools.map(t => `<span class="tag" style="font-size:18px;padding:5px 14px;">${t}</span>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>`;
+}
+
+// ================================================================
+// SLIDE REGISTRY
+// ================================================================
+function buildSlides() {
+  return [
+    { id: 'title',      html: slideTitle()     },
+    { id: 'overview',   html: slideOverview()  },
+    { id: 'financials', html: slideFinancials() },
+    ...DATA.services.map(s => ({ id: `svc-${s.id}`, html: slideService(s) })),
+    { id: 'techstack',  html: slideTechStack() }
+  ];
+}
+
+// ================================================================
+// RENDER ENGINE
+// ================================================================
+let slides = [];
+let current = 0;
+
+function render() {
+  slides = buildSlides();
+  const deck = document.getElementById('deck');
+
+  deck.innerHTML = slides.map((s, i) => `
+    <div class="slide${i === 0 ? ' active' : ''}" data-i="${i}" data-id="${s.id}">
+      ${s.html}
+    </div>`).join('');
+
+  document.getElementById('dotNav').innerHTML = slides.map((_, i) => `
+    <div class="dot${i === 0 ? ' active' : ''}" onclick="goTo(${i})" title="Slide ${i+1}"></div>`).join('');
+
+  document.getElementById('slideCounter').textContent = `1 / ${slides.length}`;
+  updateProgress();
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= slides.length || idx === current) return;
+  const all = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.dot');
+
+  all[current].classList.remove('active');
+  if (idx > current) all[current].classList.add('exit-left');
+  current = idx;
+  all[current].classList.remove('exit-left');
+  all[current].classList.add('active');
+
+  setTimeout(() => all.forEach(s => { if (!s.classList.contains('active')) s.classList.remove('exit-left'); }), 360);
+
+  dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  document.getElementById('slideCounter').textContent = `${current + 1} / ${slides.length}`;
+  updateProgress();
+}
+
+function nextSlide() { goTo(current + 1); }
+function prevSlide() { goTo(current - 1); }
+
+function goToService(id) {
+  const idx = slides.findIndex(s => s.id === `svc-${id}`);
+  if (idx >= 0) goTo(idx);
+}
+
+function updateProgress() {
+  document.getElementById('progressBar').style.width = ((current + 1) / slides.length * 100) + '%';
+}
+
+document.addEventListener('keydown', e => {
+  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); nextSlide(); }
+  if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+  if (e.key === 'Home') goTo(0);
+  if (e.key === 'End')  goTo(slides.length - 1);
+});
+
+// Touch/swipe support
+let touchX = null;
+document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) dx < 0 ? nextSlide() : prevSlide();
+  touchX = null;
+});
+
+// Initialize
+render();
+</script>
+</body>
+</html>

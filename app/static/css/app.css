@@ -1,0 +1,125 @@
+/* ETE Service Catalog — application styles */
+:root {
+  --gl-orange: #FF8300;
+  --gl-yellow: #F7B334;
+  --gl-white: #FFFFFF;
+  --gl-passion: #200F51;
+  --gl-grape: #472BA4;
+  --gl-lilac: #D1C1FF;
+  --bg: #0A0620;
+  --bg-gradient: radial-gradient(ellipse at top right, #6B1800 0%, #3A0D5C 25%, #200F51 60%, #0A0620 100%);
+  --card-bg: rgba(255,255,255,0.06);
+  --card-border: 1.5px solid rgba(209,193,255,0.25);
+  --text: #FFFFFF;
+  --text-dim: rgba(255,255,255,0.65);
+  --font-head: 'Montserrat', 'Arial Black', sans-serif;
+  --font-body: 'Nunito', 'Helvetica Neue', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* --- Top bar --- */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,6,32,0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(209,193,255,0.15);
+}
+.topbar-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; gap: 24px;
+  padding: 14px 28px;
+}
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.brand-mark {
+  font-family: var(--font-head); font-weight: 800; font-size: 18px;
+  background: linear-gradient(135deg, var(--gl-grape), var(--gl-orange));
+  color: #fff; padding: 6px 10px; border-radius: 8px;
+}
+.brand-mark.large { font-size: 34px; padding: 12px 18px; margin: 0 auto 12px; }
+.brand-name { font-family: var(--font-head); font-weight: 700; font-size: 16px; }
+
+.topnav { display: flex; gap: 6px; flex: 1; }
+.topnav a {
+  color: var(--gl-lilac); text-decoration: none; font-size: 14px; font-weight: 600;
+  padding: 7px 13px; border-radius: 8px; transition: all .15s;
+}
+.topnav a:hover { background: rgba(255,131,0,0.15); color: var(--gl-orange); }
+
+.topbar-user { display: flex; align-items: center; gap: 12px; }
+.user-label { color: var(--gl-lilac); font-size: 13px; }
+
+/* --- Content --- */
+.content { max-width: 1200px; margin: 0 auto; padding: 32px 28px 80px; }
+
+.page-head { margin-bottom: 24px; }
+.section-label {
+  font-family: var(--font-head); font-size: 12px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase; color: var(--gl-lilac);
+  opacity: .8; margin-bottom: 6px;
+}
+h1 { font-family: var(--font-head); font-size: 40px; font-weight: 800; line-height: 1.05; }
+h2 { font-family: var(--font-head); font-size: 24px; font-weight: 700; }
+.accent { color: var(--gl-orange); }
+
+/* --- Cards --- */
+.card {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+.placeholder-card { max-width: 640px; }
+.placeholder-card p { margin-top: 12px; color: var(--text-dim); }
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--font-body); font-weight: 700; font-size: 14px;
+  padding: 9px 18px; border-radius: 9px; border: none; cursor: pointer;
+  text-decoration: none; transition: all .15s;
+}
+.btn-primary { background: linear-gradient(135deg, var(--gl-grape), var(--gl-orange)); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-ghost { background: transparent; color: var(--gl-lilac); border: 1px solid rgba(209,193,255,0.25); }
+.btn-ghost:hover { background: rgba(255,131,0,0.12); color: var(--gl-orange); }
+.btn-block { width: 100%; }
+
+/* --- Forms --- */
+.field { display: block; margin-bottom: 16px; }
+.field-label {
+  display: block; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--gl-lilac); margin-bottom: 6px;
+}
+.field input, .field select, .field textarea {
+  width: 100%; padding: 10px 12px; border-radius: 8px;
+  background: rgba(255,255,255,0.05); color: var(--text);
+  border: 1px solid rgba(209,193,255,0.25); font-family: var(--font-body); font-size: 14px;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--gl-orange);
+}
+.field textarea { min-height: 90px; resize: vertical; }
+
+/* --- Flash messages --- */
+.flash-stack { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+.flash { padding: 11px 15px; border-radius: 9px; font-size: 14px; font-weight: 600; }
+.flash-success { background: rgba(0,180,120,0.15); border: 1px solid rgba(0,180,120,0.4); color: #7dffb0; }
+.flash-danger  { background: rgba(220,60,60,0.15); border: 1px solid rgba(220,60,60,0.4); color: #ff9a9a; }
+.flash-info    { background: rgba(71,43,164,0.25); border: 1px solid rgba(209,193,255,0.3); color: var(--gl-lilac); }
+
+/* --- Login --- */
+.login-wrap { min-height: 70vh; display: flex; align-items: center; justify-content: center; }
+.login-card { width: 100%; max-width: 380px; text-align: center; }
+.login-title { font-family: var(--font-head); font-size: 28px; font-weight: 800; margin-top: 8px; }
+.login-sub { color: var(--text-dim); font-size: 14px; margin-bottom: 22px; }
+.login-card .field { text-align: left; }

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ config.APP_NAME }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{{ url_for('main.dashboard') }}">
+        <span class="brand-mark">ETE</span>
+        <span class="brand-name">Service Catalog</span>
+      </a>
+      <nav class="topnav">
+        <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+        {# Phase 1+: Services, Vendors, Contractors, Employees, Cost Centers, Tools, Trends, Export #}
+      </nav>
+      <div class="topbar-user">
+        {% if current_user.is_authenticated %}
+          <span class="user-label">{{ current_user.username }}</span>
+          <a class="btn btn-ghost" href="{{ url_for('auth.logout') }}">Log out</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

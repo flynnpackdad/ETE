@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <div class="section-label">Dashboard</div>
+    <h1>ETE <span class="accent">Service Catalog</span></h1>
+  </div>
+</div>
+
+<div class="card placeholder-card">
+  <h2>Phase 0 — Foundation</h2>
+  <p>
+    Authentication and the application shell are in place. You are logged in as
+    <strong>{{ current_user.username }}</strong>.
+  </p>
+  <p>
+    Up next (Phase 1): create and manage <strong>Cost Centers</strong> and
+    <strong>Services</strong> — the anchor entities of the catalog.
+  </p>
+</div>
+{% endblock %}
