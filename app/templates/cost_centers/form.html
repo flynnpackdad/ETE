@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Cost Centers</div>
+  <h1>{{ title }}</h1>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.name.label }}
+    {{ form.name(class_="input", placeholder="e.g. IT Engineering") }}
+    {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.description.label }}
+    {{ form.description(class_="input", rows=3, placeholder="Optional notes about this cost center") }}
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">Save Cost Center</button>
+    <a class="btn btn-secondary" href="{{ url_for('cost_centers.list_') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

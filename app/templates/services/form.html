@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Services</div>
+  <h1>{{ title }}</h1>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.name.label }}
+    {{ form.name(class_="input", placeholder="e.g. Laptop & Hardware Services") }}
+    {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.description.label }}
+    {{ form.description(class_="input", rows=4, placeholder="What does this service do?") }}
+  </label>
+
+  <div class="field-row">
+    <label class="field">
+      {{ form.cost_drivers.label }}
+      {{ form.cost_drivers(class_="input", rows=5, placeholder="One per line") }}
+    </label>
+    <label class="field">
+      {{ form.deliverables.label }}
+      {{ form.deliverables(class_="input", rows=5, placeholder="One per line") }}
+    </label>
+  </div>
+
+  <div class="field-row">
+    <label class="field field-narrow">
+      {{ form.sort_order.label }}
+      {{ form.sort_order(class_="input") }}
+    </label>
+    <label class="field field-check">
+      {{ form.is_active(class_="checkbox") }} {{ form.is_active.label }}
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">Save Service</button>
+    <a class="btn btn-secondary" href="{{ url_for('services.list_') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

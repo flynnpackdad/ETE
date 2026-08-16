@@ -19,4 +19,15 @@ leadership-ready HTML presentation.
 
 Flask · Jinja (server-rendered) · WTForms · SQLAlchemy · SQLite · Chart.js (trends, Phase 3)
 
+## Phases
+
+- [x] **Phase 0** — Foundation: app factory, config, auth, base layout, full domain model
+- [x] **Phase 1** — Core CRUD: Cost Centers + Services
+- [ ] **Phase 2** — Resources CRUD: Vendors, Contractors, Employees, Tools + service links with cost-splitting
+- [ ] **Phase 3** — Time tracking: quarterly TimePoints + QoQ/YoY charts
+- [ ] **Phase 4** — Dashboard: cost by service, by cost center, totals
+- [ ] **Phase 5** — HTML export: deck mirroring the sample
+- [ ] **Phase 6** — (Later) multi-catalog growth
+
 ## Setup
+

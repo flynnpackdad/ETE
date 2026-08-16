@@ -28,11 +28,18 @@ def create_app(config_object=Config):
     login_manager.login_message_category = "info"
 
     # Blueprints
-    from .auth import bp as auth_bp
+    from .auth import bp as auth_bp, csrf
     from .main import bp as main_bp
+    from .cost_centers import bp as cost_centers_bp
+    from .services import bp as services_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(cost_centers_bp)
+    app.register_blueprint(services_bp)
+
+    # Global CSRF protection (respects @csrf.exempt on the login route)
+    csrf.init_app(app)
 
     # Create tables on first run.
     with app.app_context():
@@ -49,7 +56,6 @@ def _bootstrap_user(app):
     update the stored hash so the next login uses the new credential.
     """
     from .models import User
-    from werkzeug.security import generate_password_hash
 
     username = app.config["APP_USERNAME"]
     password = app.config["APP_PASSWORD"]
