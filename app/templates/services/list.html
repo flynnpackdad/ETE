@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Services · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">The Anchor</div>
+    <h1>Services</h1>
+    <p class="page-subtitle">The things ETE delivers. Cost and resources attach to each service.</p>
+  </div>
+  <a class="btn btn-primary btn-lg" href="{{ url_for('services.create') }}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    New Service
+  </a>
+</div>
+
+{% if all_services %}
+<div class="card table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width:50px;">#</th>
+        <th>Service</th>
+        <th style="width:120px;">Status</th>
+        <th class="right" style="width:200px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for svc in all_services %}
+      <tr class="{{ '' if svc.is_active else 'row-inactive' }}">
+        <td class="muted">{{ loop.index }}</td>
+        <td>
+          <a class="svc-link" href="{{ url_for('services.detail', sid=svc.id) }}">{{ svc.name }}</a>
+        </td>
+        <td>
+          {% if svc.is_active %}
+            <span class="tag tag-active">Active</span>
+          {% else %}
+            <span class="tag tag-inactive">Inactive</span>
+          {% endif %}
+        </td>
+        <td class="right">
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('services.detail', sid=svc.id) }}">View</a>
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('services.edit', sid=svc.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('services.delete', sid=svc.id) }}" class="inline"
+                onsubmit="return confirm('Delete service "{{ svc.name }}" and all its data?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card placeholder-card">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="var(--gray-300)" style="margin-bottom:16px;">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
+  </svg>
+  <h2>No services yet</h2>
+  <p>Create your first service to get started.</p>
+  <a class="btn btn-primary" href="{{ url_for('services.create') }}" style="margin-top:16px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    New Service
+  </a>
+</div>
+{% endif %}
+{% endblock %}
