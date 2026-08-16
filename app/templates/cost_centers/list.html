@@ -21,11 +21,11 @@
   {% for cc in centers %}
   <div class="card entity-card">
     <div class="entity-head">
-      <h3>{{ cc.name }}</h3>
+      <h3><a href="{{ url_for('cost_centers.detail', cid=cc.id) }}">{{ cc.name }}</a></h3>
       <div class="entity-actions">
         <a class="btn btn-ghost btn-sm" href="{{ url_for('cost_centers.edit', cid=cc.id) }}">Edit</a>
         <form method="post" action="{{ url_for('cost_centers.delete', cid=cc.id) }}"
-              onsubmit="return confirm('Delete cost center "{{ cc.name }}"?');">
+              onsubmit="return confirm('Delete cost center &quot;{{ cc.name }}&quot;?');">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn btn-danger btn-sm">Delete</button>
         </form>

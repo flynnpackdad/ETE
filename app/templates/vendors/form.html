@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Vendors</div>
+  <h1>{{ title }}</h1>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.name.label }}
+    {{ form.name(class_="input", placeholder="e.g. Dell Technologies") }}
+    {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.cost_center_id.label }}
+    {{ form.cost_center_id(class_="input") }}
+    {% for e in form.cost_center_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.notes.label }}
+    {{ form.notes(class_="input", rows=3, placeholder="Optional notes about this vendor") }}
+  </label>
+
+  <label class="field field-check">
+    {{ form.is_active(class_="checkbox") }} {{ form.is_active.label }}
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">Save Vendor</button>
+    <a class="btn btn-secondary" href="{{ url_for('vendors.list_') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

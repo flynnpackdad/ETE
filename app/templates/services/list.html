@@ -45,7 +45,7 @@
           <a class="btn btn-ghost btn-sm" href="{{ url_for('services.detail', sid=svc.id) }}">View</a>
           <a class="btn btn-ghost btn-sm" href="{{ url_for('services.edit', sid=svc.id) }}">Edit</a>
           <form method="post" action="{{ url_for('services.delete', sid=svc.id) }}" class="inline"
-                onsubmit="return confirm('Delete service "{{ svc.name }}" and all its data?');">
+                onsubmit="return confirm('Delete service &quot;{{ svc.name }}&quot; and all its data?');">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
           </form>

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ cc.name }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Cost Center</div>
+    <h1>{{ cc.name }}</h1>
+  </div>
+  <div class="entity-actions">
+    <a class="btn btn-secondary" href="{{ url_for('cost_centers.edit', cid=cc.id) }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
+      </svg>
+      Edit
+    </a>
+    <a class="btn btn-ghost" href="{{ url_for('cost_centers.list_') }}">All Cost Centers</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="card">
+    <div class="section-label" style="margin-bottom:12px;">Description</div>
+    <p class="detail-text">{{ cc.description or '<span class="muted">No description provided.</span>' | safe }}</p>
+  </div>
+
+  <div class="card">
+    <div class="section-label" style="margin-bottom:12px;">Resource Summary</div>
+    <table class="detail-table">
+      <tr><th>Vendors</th><td>{{ cc.vendors|length }}</td></tr>
+      <tr><th>Contractors</th><td>{{ cc.contractors|length }}</td></tr>
+      <tr><th>Employees</th><td>{{ cc.employees|length }}</td></tr>
+    </table>
+  </div>
+</div>
+
+{% if cc.vendors %}
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Vendors</div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Name</th><th>Contractors</th><th class="right">All-Up Cost</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for v in cc.vendors %}
+        <tr>
+          <td><a href="{{ url_for('vendors.detail', vid=v.id) }}">{{ v.name }}</a></td>
+          <td>{{ v.contractors|length }}</td>
+          <td class="right">${% if v.all_up_cost %}{{ "%.2f"|format(v.all_up_cost) }}{% else %}0.00{% endif %}</td>
+          <td>{% if v.is_active %}<span class="tag tag-active">Active</span>{% else %}<span class="tag tag-inactive">Inactive</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if cc.contractors %}
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Contractors</div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Name</th><th>Vendor</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for c in cc.contractors %}
+        <tr>
+          <td><a href="{{ url_for('contractors.detail', cid=c.id) }}">{{ c.name }}</a></td>
+          <td>{{ c.vendor.name if c.vendor else '<span class="muted">—</span>' | safe }}</td>
+          <td>{% if c.is_active %}<span class="tag tag-active">Active</span>{% else %}<span class="tag tag-inactive">Inactive</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if cc.employees %}
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Employees</div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Name</th><th>FTE</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for e in cc.employees %}
+        <tr>
+          <td><a href="{{ url_for('employees.detail', eid=e.id) }}">{{ e.name }}</a></td>
+          <td>{% if e.fte %}{{ "%.2f"|format(e.fte) }}{% else %}1.00{% endif %}</td>
+          <td>{% if e.is_active %}<span class="tag tag-active">Active</span>{% else %}<span class="tag tag-inactive">Inactive</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if not cc.vendors and not cc.contractors and not cc.employees %}
+<div class="card" style="margin-top:16px;">
+  <p class="muted">No resources assigned to this cost center yet.</p>
+</div>
+{% endif %}
+{% endblock %}

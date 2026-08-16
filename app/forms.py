@@ -2,7 +2,7 @@
 WTForms for the ETE Service Catalog.
 
 Phase 1: CostCenterForm, ServiceForm.
-Later phases add resource/link/time-point forms.
+Phase 2: VendorForm, ContractorForm, EmployeeForm, ResourceServiceLinkForm.
 """
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -32,3 +32,57 @@ class ServiceForm(FlaskForm):
     )
     sort_order = IntegerField("Sort order", validators=[Optional()], default=0)
     is_active = BooleanField("Active", default=True)
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 — Resource forms
+# ---------------------------------------------------------------------------
+class VendorForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    cost_center_id = SelectField(
+        "Cost Center", coerce=int, validators=[DataRequired()]
+    )
+    notes = TextAreaField("Notes", validators=[Optional()])
+    is_active = BooleanField("Active", default=True)
+
+
+class ContractorForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    cost_center_id = SelectField(
+        "Cost Center", coerce=int, validators=[DataRequired()]
+    )
+    vendor_id = SelectField(
+        "Vendor (optional)", coerce=int, validators=[Optional()]
+    )
+    notes = TextAreaField("Notes", validators=[Optional()])
+    is_active = BooleanField("Active", default=True)
+
+
+class EmployeeForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    cost_center_id = SelectField(
+        "Cost Center", coerce=int, validators=[DataRequired()]
+    )
+    fte = FloatField(
+        "FTE", validators=[Optional(), NumberRange(min=0.0, max=2.0)],
+        default=1.0,
+    )
+    notes = TextAreaField("Notes", validators=[Optional()])
+    is_active = BooleanField("Active", default=True)
+
+
+class ResourceServiceLinkForm(FlaskForm):
+    resource_id = SelectField(
+        "Resource", coerce=int, validators=[DataRequired()]
+    )
+    service_id = SelectField(
+        "Service", coerce=int, validators=[DataRequired()]
+    )
+    current_amount = FloatField(
+        "Annual Cost ($)", validators=[Optional(), NumberRange(min=0)],
+        default=0.0,
+    )
+    current_fte = FloatField(
+        "FTE Allocation", validators=[Optional(), NumberRange(min=0)],
+        default=0.0,
+    )
