@@ -46,6 +46,12 @@ def create():
                            title="New Cost Center")
 
 
+@bp.route("/cost-centers/<int:cid>")
+def detail(cid):
+    cc = db.session.get(CostCenter, cid) or abort(404)
+    return render_template("cost_centers/detail.html", cc=cc)
+
+
 @bp.route("/cost-centers/<int:cid>/edit", methods=["GET", "POST"])
 def edit(cid):
     cc = db.session.get(CostCenter, cid) or abort(404)

@@ -712,6 +712,37 @@ textarea.input {
 }
 
 /* ============================================================
+   DETAIL TABLE (key-value pairs on detail pages)
+   ============================================================ */
+.detail-table {
+  width: 100%;
+}
+
+.detail-table tr {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.detail-table tr:last-child {
+  border-bottom: none;
+}
+
+.detail-table th {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-400);
+  padding: 10px 0;
+  text-align: left;
+  width: 120px;
+  vertical-align: top;
+}
+
+.detail-table td {
+  font-size: 15px;
+  color: var(--gray-700);
+  padding: 10px 0;
+}
+
+/* ============================================================
    BULLET LISTS
    ============================================================ */
 .bullet-list {

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Employees · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Resources</div>
+    <h1>Employees</h1>
+    <p class="page-subtitle">Internal FTEs. Each employee is booked to a cost center.</p>
+  </div>
+  <a class="btn btn-primary btn-lg" href="{{ url_for('employees.create') }}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    New Employee
+  </a>
+</div>
+
+{% if employees %}
+<div class="card table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width:50px;">#</th>
+        <th>Employee</th>
+        <th>Cost Center</th>
+        <th>FTE</th>
+        <th style="width:120px;">Status</th>
+        <th class="right" style="width:200px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in employees %}
+      <tr class="{{ '' if e.is_active else 'row-inactive' }}">
+        <td class="muted">{{ loop.index }}</td>
+        <td>
+          <a class="svc-link" href="{{ url_for('employees.detail', eid=e.id) }}">{{ e.name }}</a>
+        </td>
+        <td>{{ e.cost_center.name if e.cost_center else '<span class="muted">—</span>' | safe }}</td>
+        <td>{% if e.fte %}{{ "%.2f"|format(e.fte) }}{% else %}1.00{% endif %}</td>
+        <td>
+          {% if e.is_active %}
+            <span class="tag tag-active">Active</span>
+          {% else %}
+            <span class="tag tag-inactive">Inactive</span>
+          {% endif %}
+        </td>
+        <td class="right">
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('employees.detail', eid=e.id) }}">View</a>
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('employees.edit', eid=e.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('employees.delete', eid=e.id) }}" class="inline"
+                onsubmit="return confirm('Delete employee "{{ e.name }}" and all its data?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card placeholder-card">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="var(--gray-300)" style="margin-bottom:16px;">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
+  </svg>
+  <h2>No employees yet</h2>
+  <p>Add employees to track internal FTE allocations.</p>
+  <a class="btn btn-primary" href="{{ url_for('employees.create') }}" style="margin-top:16px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    New Employee
+  </a>
+</div>
+{% endif %}
+{% endblock %}

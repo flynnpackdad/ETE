@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Resources</div>
+  <h1>{{ title }}</h1>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.resource_id.label }}
+    {{ form.resource_id(class_="input") }}
+    {% for e in form.resource_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.service_id.label }}
+    {{ form.service_id(class_="input") }}
+    {% for e in form.service_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <div class="field-row">
+    <label class="field">
+      {{ form.current_amount.label }}
+      {{ form.current_amount(class_="input", step="0.01") }}
+      {% for e in form.current_amount.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+    </label>
+    <label class="field">
+      {{ form.current_fte.label }}
+      {{ form.current_fte(class_="input", step="0.01") }}
+      {% for e in form.current_fte.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">Save Link</button>
+    {% if link %}
+      <a class="btn btn-secondary" href="{{ url_for('services.detail', sid=link.service_id) }}">Cancel</a>
+    {% else %}
+      <a class="btn btn-secondary" href="{{ url_for('services.detail', sid=service.id) }}">Cancel</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ vendor.name }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Vendor</div>
+    <h1>{{ vendor.name }}</h1>
+  </div>
+  <div class="entity-actions">
+    <a class="btn btn-secondary" href="{{ url_for('vendors.edit', vid=vendor.id) }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
+      </svg>
+      Edit
+    </a>
+    <a class="btn btn-ghost" href="{{ url_for('vendors.list_') }}">All Vendors</a>
+  </div>
+</div>
+
+{% if not vendor.is_active %}
+<div class="flash flash-info">This vendor is marked inactive.</div>
+{% endif %}
+
+<div class="detail-grid">
+  <div class="card">
+    <div class="section-label" style="margin-bottom:12px;">Details</div>
+    <table class="detail-table">
+      <tr><th>Cost Center</th><td>{{ vendor.cost_center.name if vendor.cost_center else '—' }}</td></tr>
+      <tr><th>Contractors</th><td>{{ vendor.contractors|length }}</td></tr>
+      <tr><th>All-Up Cost</th><td>${% if vendor.all_up_cost %}{{ "%.2f"|format(vendor.all_up_cost) }}{% else %}0.00{% endif %}</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="section-label" style="margin-bottom:12px;">Notes</div>
+    <p class="detail-text">{{ vendor.notes or '<span class="muted">No notes provided.</span>' | safe }}</p>
+  </div>
+</div>
+
+{% if vendor.contractors %}
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Contractors</div>
+  <div class="card-grid">
+    {% for c in vendor.contractors %}
+    <div class="card" style="box-shadow:none; border:1px solid var(--gray-200);">
+      <div class="entity-head">
+        <h3><a href="{{ url_for('contractors.detail', cid=c.id) }}">{{ c.name }}</a></h3>
+      </div>
+      <div class="entity-stats" style="border-top:none; margin-top:4px; padding-top:0;">
+        <span>{{ 'Active' if c.is_active else 'Inactive' }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Service Links</div>
+  {% if vendor.links %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th class="right">Annual Cost</th>
+          <th class="right">FTE</th>
+          <th class="right" style="width:120px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for link in vendor.links %}
+        <tr>
+          <td><a href="{{ url_for('services.detail', sid=link.service_id) }}">{{ link.service.name }}</a></td>
+          <td class="right">${% if link.current_amount %}{{ "%.2f"|format(link.current_amount) }}{% else %}0.00{% endif %}</td>
+          <td class="right">{% if link.current_fte %}{{ "%.2f"|format(link.current_fte) }}{% else %}—{% endif %}</td>
+          <td class="right">
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('links.edit', lid=link.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('links.delete', lid=link.id) }}" class="inline"
+                  onsubmit="return confirm('Remove this resource from the service?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">No services linked yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

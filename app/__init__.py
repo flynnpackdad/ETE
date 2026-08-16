@@ -32,11 +32,19 @@ def create_app(config_object=Config):
     from .main import bp as main_bp
     from .cost_centers import bp as cost_centers_bp
     from .services import bp as services_bp
+    from .vendors import bp as vendors_bp
+    from .contractors import bp as contractors_bp
+    from .employees import bp as employees_bp
+    from .links import bp as links_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(cost_centers_bp)
     app.register_blueprint(services_bp)
+    app.register_blueprint(vendors_bp)
+    app.register_blueprint(contractors_bp)
+    app.register_blueprint(employees_bp)
+    app.register_blueprint(links_bp)
 
     # Global CSRF protection (respects @csrf.exempt on the login route)
     csrf.init_app(app)

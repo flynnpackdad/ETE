@@ -58,6 +58,59 @@
 
 <div class="card" style="margin-top:16px;">
   <div class="section-label" style="margin-bottom:8px;">Resources & Cost</div>
-  <p class="muted">Vendors, contractors, and employees will appear here with their cost allocations in Phase 2.</p>
+  {% if svc.links %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Resource</th>
+          <th>Type</th>
+          <th>Cost Center</th>
+          <th class="right">Annual Cost</th>
+          <th class="right">FTE</th>
+          <th class="right" style="width:120px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for link in svc.links %}
+        <tr>
+          <td>
+            {% set r = link.resource %}
+            {% if r.kind == 'vendor' %}
+              <a href="{{ url_for('vendors.detail', vid=r.id) }}">{{ r.name }}</a>
+            {% elif r.kind == 'contractor' %}
+              <a href="{{ url_for('contractors.detail', cid=r.id) }}">{{ r.name }}</a>
+            {% else %}
+              <a href="{{ url_for('employees.detail', eid=r.id) }}">{{ r.name }}</a>
+            {% endif %}
+          </td>
+          <td><span class="tag">{{ r.kind | title }}</span></td>
+          <td>{{ r.cost_center.name if r.cost_center else '<span class="muted">—</span>' | safe }}</td>
+          <td class="right">${% if link.current_amount %}{{ "%.2f"|format(link.current_amount) }}{% else %}0.00{% endif %}</td>
+          <td class="right">{% if link.current_fte %}{{ "%.2f"|format(link.current_fte) }}{% else %}—{% endif %}</td>
+          <td class="right">
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('links.edit', lid=link.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('links.delete', lid=link.id) }}" class="inline"
+                  onsubmit="return confirm('Remove this resource from the service?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">No resources linked yet.</p>
+  {% endif %}
+  <div style="margin-top:16px;">
+    <a class="btn btn-primary" href="{{ url_for('links.create', sid=svc.id) }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+      </svg>
+      Link Resource
+    </a>
+  </div>
 </div>
 {% endblock %}

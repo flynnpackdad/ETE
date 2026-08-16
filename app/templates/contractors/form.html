@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Contractors</div>
+  <h1>{{ title }}</h1>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.name.label }}
+    {{ form.name(class_="input", placeholder="e.g. Jane Smith") }}
+    {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.cost_center_id.label }}
+    {{ form.cost_center_id(class_="input") }}
+    {% for e in form.cost_center_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.vendor_id.label }}
+    {{ form.vendor_id(class_="input") }}
+    {% for e in form.vendor_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.notes.label }}
+    {{ form.notes(class_="input", rows=3, placeholder="Optional notes about this contractor") }}
+  </label>
+
+  <label class="field field-check">
+    {{ form.is_active(class_="checkbox") }} {{ form.is_active.label }}
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">Save Contractor</button>
+    <a class="btn btn-secondary" href="{{ url_for('contractors.list_') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Contractors · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Resources</div>
+    <h1>Contractors</h1>
+    <p class="page-subtitle">Individual contractors. Each is booked to a cost center and optionally rolls up to a vendor.</p>
+  </div>
+  <a class="btn btn-primary btn-lg" href="{{ url_for('contractors.create') }}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    New Contractor
+  </a>
+</div>
+
+{% if contractors %}
+<div class="card table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width:50px;">#</th>
+        <th>Contractor</th>
+        <th>Cost Center</th>
+        <th>Vendor</th>
+        <th style="width:120px;">Status</th>
+        <th class="right" style="width:200px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in contractors %}
+      <tr class="{{ '' if c.is_active else 'row-inactive' }}">
+        <td class="muted">{{ loop.index }}</td>
+        <td>
+          <a class="svc-link" href="{{ url_for('contractors.detail', cid=c.id) }}">{{ c.name }}</a>
+        </td>
+        <td>{{ c.cost_center.name if c.cost_center else '<span class="muted">—</span>' | safe }}</td>
+        <td>{{ c.vendor.name if c.vendor else '<span class="muted">—</span>' | safe }}</td>
+        <td>
+          {% if c.is_active %}
+            <span class="tag tag-active">Active</span>
+          {% else %}
+            <span class="tag tag-inactive">Inactive</span>
+          {% endif %}
+        </td>
+        <td class="right">
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('contractors.detail', cid=c.id) }}">View</a>
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('contractors.edit', cid=c.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('contractors.delete', cid=c.id) }}" class="inline"
+                onsubmit="return confirm('Delete contractor "{{ c.name }}" and all its data?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card placeholder-card">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="var(--gray-300)" style="margin-bottom:16px;">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+  </svg>
+  <h2>No contractors yet</h2>
+  <p>Add contractors to track individual contract workers.</p>
+  <a class="btn btn-primary" href="{{ url_for('contractors.create') }}" style="margin-top:16px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    New Contractor
+  </a>
+</div>
+{% endif %}
+{% endblock %}
