@@ -51,7 +51,7 @@
           <a class="btn btn-ghost btn-sm" href="{{ url_for('vendors.detail', vid=v.id) }}">View</a>
           <a class="btn btn-ghost btn-sm" href="{{ url_for('vendors.edit', vid=v.id) }}">Edit</a>
           <form method="post" action="{{ url_for('vendors.delete', vid=v.id) }}" class="inline"
-                onsubmit="return confirm('Delete vendor "{{ v.name }}" and all its data?');">
+                onsubmit="return confirm('Delete vendor &quot;{{ v.name }}&quot; and all its data?');">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
           </form>

@@ -48,8 +48,8 @@
         <td class="right">
           <a class="btn btn-ghost btn-sm" href="{{ url_for('contractors.detail', cid=c.id) }}">View</a>
           <a class="btn btn-ghost btn-sm" href="{{ url_for('contractors.edit', cid=c.id) }}">Edit</a>
-          <form method="post" action="{{ url_for('contractors.delete', cid=c.id) }}" class="inline"
-                onsubmit="return confirm('Delete contractor "{{ c.name }}" and all its data?');">
+          <form method="post" action="{{ url_for('contractors.delete', cid=c.id) }}"
+                onsubmit="return confirm('Delete contractor &quot;{{ c.name }}&quot; and all its data?');">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
           </form>

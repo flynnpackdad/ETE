@@ -594,6 +594,7 @@ select.input {
   outline: none;
   transition: border-color var(--transition), box-shadow var(--transition);
   -webkit-appearance: none;
+appearance: none;
 }
 
 .input:focus,

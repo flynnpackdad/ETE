@@ -1,3 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Overview</div>
+  <h1>Dashboard</h1>
+  <p class="page-subtitle">Welcome back, <strong>{{ current_user.username }}</strong>. Here's a snapshot of your service catalog.</p>
+</div>
+
 <div class="stat-grid">
   <div class="stat-card">
     <div class="stat-icon blue">
@@ -84,4 +94,4 @@
     <li>Link resources to <a href="{{ url_for('services.list_') }}"><strong>Services</strong></a> to allocate costs</li>
   </ul>
 </div>
-
+{% endblock %}

@@ -25,7 +25,7 @@
       <div class="entity-actions">
         <a class="btn btn-ghost btn-sm" href="{{ url_for('cost_centers.edit', cid=cc.id) }}">Edit</a>
         <form method="post" action="{{ url_for('cost_centers.delete', cid=cc.id) }}"
-              onsubmit="return confirm('Delete cost center "{{ cc.name }}"?');">
+              onsubmit="return confirm('Delete cost center &quot;{{ cc.name }}&quot;?');">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn btn-danger btn-sm">Delete</button>
         </form>
