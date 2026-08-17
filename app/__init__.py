@@ -36,6 +36,8 @@ def create_app(config_object=Config):
     from .contractors import bp as contractors_bp
     from .employees import bp as employees_bp
     from .links import bp as links_bp
+    from .tools import bp as tools_bp
+    from .timepoints import bp as timepoints_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
@@ -45,6 +47,8 @@ def create_app(config_object=Config):
     app.register_blueprint(contractors_bp)
     app.register_blueprint(employees_bp)
     app.register_blueprint(links_bp)
+    app.register_blueprint(tools_bp)
+    app.register_blueprint(timepoints_bp)
 
     # Global CSRF protection (respects @csrf.exempt on the login route)
     csrf.init_app(app)

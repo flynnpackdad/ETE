@@ -47,7 +47,7 @@
           <th>Service</th>
           <th class="right">Annual Cost</th>
           <th class="right">FTE Allocation</th>
-          <th class="right" style="width:120px;">Actions</th>
+          <th class="right" style="width:180px;">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -57,6 +57,7 @@
           <td class="right">${% if link.current_amount %}{{ "%.2f"|format(link.current_amount) }}{% else %}0.00{% endif %}</td>
           <td class="right">{% if link.current_fte %}{{ "%.2f"|format(link.current_fte) }}{% else %}—{% endif %}</td>
           <td class="right">
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('timepoints.link_history', lid=link.id) }}">Trend</a>
             <a class="btn btn-ghost btn-sm" href="{{ url_for('links.edit', lid=link.id) }}">Edit</a>
             <form method="post" action="{{ url_for('links.delete', lid=link.id) }}" class="inline"
                   onsubmit="return confirm('Remove this resource from the service?');">

@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}{{ link.resource.name }} → {{ link.service.name }} · Trend · {{ config.APP_NAME }}{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Trend</div>
+    <h1>{{ link.resource.name }} → {{ link.service.name }}</h1>
+    <p class="page-subtitle">Quarterly cost &amp; FTE history for this resource-service link.</p>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <a class="btn btn-primary btn-lg" href="{{ url_for('timepoints.add_snapshot', lid=link.id) }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+      </svg>
+      Add Snapshot
+    </a>
+    <a class="btn btn-secondary" href="{{ url_for('services.detail', sid=link.service_id) }}">Back to Service</a>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Current Values</div>
+  <div style="display:flex; gap:24px;">
+    <div>
+      <div style="font-size:13px; color:var(--gray-500); font-weight:600;">Annual Cost</div>
+      <div style="font-size:24px; font-weight:700; color:var(--gray-800); margin-top:4px;">
+        ${% if link.current_amount %}{{ "%.2f"|format(link.current_amount) }}{% else %}0.00{% endif %}
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px; color:var(--gray-500); font-weight:600;">FTE</div>
+      <div style="font-size:24px; font-weight:700; color:var(--gray-800); margin-top:4px;">
+        {% if link.current_fte %}{{ "%.2f"|format(link.current_fte) }}{% else %}—{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if points %}
+<div class="card" style="margin-bottom:16px;">
+  <div class="section-label" style="margin-bottom:16px;">Cost Trend</div>
+  <div style="position:relative; height:300px;">
+    <canvas id="costChart"></canvas>
+  </div>
+</div>
+
+{% if points|length > 1 %}
+<div class="card" style="margin-bottom:16px;">
+  <div class="section-label" style="margin-bottom:16px;">FTE Trend</div>
+  <div style="position:relative; height:200px;">
+    <canvas id="fteChart"></canvas>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+<div class="card">
+  <div class="section-label" style="margin-bottom:12px;">Snapshots</div>
+  {% if points %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th class="right">Annual Cost</th>
+          <th class="right">QoQ Δ</th>
+          <th class="right">YoY Δ</th>
+          <th class="right">FTE</th>
+          <th class="right" style="width:140px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in points|reverse %}
+        {% set tp = entry.tp %}
+        <tr>
+          <td><span class="tag">{{ tp.period }}</span></td>
+          <td class="right">${% if tp.amount %}{{ "%.2f"|format(tp.amount) }}{% else %}0.00{% endif %}</td>
+          <td class="right">
+            {% if entry.qoq_abs is not none %}
+              <span style="color:{% if entry.qoq_abs >= 0 %}var(--red){% else %}var(--green){% endif %}; font-weight:600;">
+                {% if entry.qoq_abs >= 0 %}+{% endif %}${{"%.2f"|format(entry.qoq_abs)}} ({{ "%+.1f"|format(entry.qoq_pct) }}%)
+              </span>
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </td>
+          <td class="right">
+            {% if entry.yoy_abs is not none %}
+              <span style="color:{% if entry.yoy_abs >= 0 %}var(--red){% else %}var(--green){% endif %}; font-weight:600;">
+                {% if entry.yoy_abs >= 0 %}+{% endif %}${{"%.2f"|format(entry.yoy_abs)}} ({{ "%+.1f"|format(entry.yoy_pct) }}%)
+              </span>
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </td>
+          <td class="right">{% if tp.fte %}{{ "%.2f"|format(tp.fte) }}{% else %}—{% endif %}</td>
+          <td class="right">
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('timepoints.edit', tpid=tp.id) }}">Edit</a>
+            <form method="post" action="{{ url_for('timepoints.delete', tpid=tp.id) }}" class="inline"
+                  onsubmit="return confirm('Delete this snapshot?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">No snapshots recorded yet. Add your first snapshot to start tracking trends.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if points|length >= 2 %}
+<script>
+(function() {
+  const labels = {{ labels | tojson }};
+  const amounts = {{ amounts | tojson }};
+  const ftes = {{ ftes | tojson }};
+
+  // Cost chart
+  new Chart(document.getElementById('costChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Annual Cost ($)',
+        data: amounts,
+        borderColor: '#007AFF',
+        backgroundColor: 'rgba(0, 122, 255, 0.08)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#007AFF',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return '$' + ctx.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) { return '$' + value.toLocaleString(); }
+          }
+        }
+      }
+    }
+  });
+
+  // FTE chart
+  new Chart(document.getElementById('fteChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'FTE',
+        data: ftes,
+        borderColor: '#34C759',
+        backgroundColor: 'rgba(52, 199, 89, 0.08)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#34C759',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ctx.parsed.y.toFixed(2) + ' FTE';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) { return value.toFixed(1); }
+          }
+        }
+      }
+    }
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}

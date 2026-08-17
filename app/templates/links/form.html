@@ -38,6 +38,7 @@
   <div class="form-actions">
     <button type="submit" class="btn btn-primary btn-lg">Save Link</button>
     {% if link %}
+      <a class="btn btn-ghost" href="{{ url_for('timepoints.link_history', lid=link.id) }}">View History</a>
       <a class="btn btn-secondary" href="{{ url_for('services.detail', sid=link.service_id) }}">Cancel</a>
     {% else %}
       <a class="btn btn-secondary" href="{{ url_for('services.detail', sid=service.id) }}">Cancel</a>

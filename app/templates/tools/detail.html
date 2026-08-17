@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ tool.name }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Tool</div>
+    <h1>{{ tool.name }}</h1>
+  </div>
+  <div class="entity-actions">
+    <a class="btn btn-secondary" href="{{ url_for('tools.edit', tid=tool.id) }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
+      </svg>
+      Edit
+    </a>
+    <a class="btn btn-ghost" href="{{ url_for('tools.list_') }}">All Tools</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="card">
+    <div class="section-label" style="margin-bottom:12px;">Details</div>
+    <table class="detail-table">
+      <tr><th>Name</th><td>{{ tool.name }}</td></tr>
+      <tr><th>Service</th><td>
+        {% if tool.service %}
+          <a href="{{ url_for('services.detail', sid=tool.service.id) }}">{{ tool.service.name }}</a>
+        {% else %}
+          <span class="muted">Unassigned</span>
+        {% endif %}
+      </td></tr>
+    </table>
+  </div>
+</div>
+
+{% if tool.service %}
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Sibling Tools on {{ tool.service.name }}</div>
+  <div class="tag-cloud">
+    {% for t in tool.service.tools %}
+      <span class="tag{% if t.id == tool.id %} tag-active{% endif %}">{{ t.name }}</span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Tools · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Resources</div>
+    <h1>Tools</h1>
+    <p class="page-subtitle">Technology stack items associated with services.</p>
+  </div>
+  <a class="btn btn-primary btn-lg" href="{{ url_for('tools.create') }}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    New Tool
+  </a>
+</div>
+
+{% if tools %}
+<div class="card table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width:50px;">#</th>
+        <th>Tool</th>
+        <th>Service</th>
+        <th class="right" style="width:200px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in tools %}
+      <tr>
+        <td class="muted">{{ loop.index }}</td>
+        <td>
+          <a class="svc-link" href="{{ url_for('tools.detail', tid=t.id) }}">{{ t.name }}</a>
+        </td>
+        <td>
+          {% if t.service %}
+            <a href="{{ url_for('services.detail', sid=t.service.id) }}">{{ t.service.name }}</a>
+          {% else %}
+            <span class="muted">Unassigned</span>
+          {% endif %}
+        </td>
+        <td class="right">
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('tools.detail', tid=t.id) }}">View</a>
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('tools.edit', tid=t.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('tools.delete', tid=t.id) }}" class="inline"
+                onsubmit="return confirm('Delete tool &quot;{{ t.name }}&quot;?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card placeholder-card">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="var(--gray-300)" style="margin-bottom:16px;">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17l-5.384 3.142 1.442-6.056L2.5 7.92l6.172-.527L11.42 2l2.748 5.393 6.172.527-4.978 4.336 1.442 6.056z"/>
+  </svg>
+  <h2>No tools yet</h2>
+  <p>Create tools to represent the technology stack supporting your services.</p>
+  <a class="btn btn-primary" href="{{ url_for('tools.create') }}" style="margin-top:16px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+    New Tool
+  </a>
+</div>
+{% endif %}
+{% endblock %}
