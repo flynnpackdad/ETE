@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETE — IT Service Catalog</title>
+<style>
+:root {
+  --gl-orange: #FF8300;
+  --gl-yellow: #F7B334;
+  --gl-white: #FFFFFF;
+  --gl-passion: #200F51;
+  --gl-grape: #472BA4;
+  --gl-lilac: #D1C1FF;
+  --gl-bg-gradient: radial-gradient(ellipse at top right, #6B1800 0%, #3A0D5C 25%, #200F51 60%, #0A0620 100%);
+  --gl-card-bg: rgba(255,255,255,0.06);
+  --gl-card-border: 1.5px solid rgba(209,193,255,0.25);
+  --gl-font-headline: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', 'Arial Black', sans-serif;
+  --gl-font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #0A0620;
+  color: var(--gl-white);
+  font-family: var(--gl-font-body);
+  overflow: hidden;
+  user-select: none;
+}
+
+.deck {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: var(--gl-bg-gradient);
+  display: flex;
+  flex-direction: column;
+  padding: 44px 56px 76px;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  overflow-y: auto;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+.slide.exit-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  pointer-events: none;
+}
+
+/* ── Progress bar ─────────────────────────── */
+#progressBar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gl-orange), var(--gl-yellow));
+  transition: width 0.3s ease;
+  z-index: 200;
+}
+
+/* ── Bottom nav ───────────────────────────── */
+.nav {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 200;
+  background: rgba(10,6,32,0.88);
+  border: 1px solid rgba(209,193,255,0.18);
+  border-radius: 40px;
+  padding: 8px 18px;
+  backdrop-filter: blur(14px);
+}
+
+.nav button {
+  background: none;
+  border: none;
+  color: var(--gl-lilac);
+  cursor: pointer;
+  font-size: 16px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.nav button:hover { background: rgba(255,131,0,0.18); color: var(--gl-orange); }
+
+.slide-counter {
+  font-family: var(--gl-font-body);
+  font-size: 12px;
+  color: rgba(209,193,255,0.65);
+  min-width: 52px;
+  text-align: center;
+}
+
+/* Jump-to dots */
+.dot-nav {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  z-index: 200;
+}
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(209,193,255,0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dot.active { background: var(--gl-orange); transform: scale(1.5); }
+.dot:hover { background: var(--gl-lilac); }
+
+/* ── Typography ───────────────────────────── */
+h1 { font-family: var(--gl-font-headline); font-size: 58px; font-weight: 800; line-height: 1.0; }
+h2 { font-family: var(--gl-font-headline); font-size: 28px; font-weight: 700; }
+h3 { font-family: var(--gl-font-headline); font-size: 16px; font-weight: 700; }
+
+.accent { color: var(--gl-orange); }
+.lilac  { color: var(--gl-lilac); }
+
+.section-label {
+  font-family: var(--gl-font-headline);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gl-lilac);
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+/* ── Cards ────────────────────────────────── */
+.card {
+  background: var(--gl-card-bg);
+  border: var(--gl-card-border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.card-accent {
+  background: rgba(255,131,0,0.07);
+  border: 1.5px solid rgba(255,131,0,0.35);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+/* ── Stat callouts ────────────────────────── */
+.stat { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.stat .value {
+  font-family: var(--gl-font-headline);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--gl-orange);
+}
+.stat .label { font-size: 13px; color: var(--gl-lilac); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+
+/* ── Service badge ────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--gl-grape), var(--gl-orange));
+  border-radius: 10px;
+  font-family: var(--gl-font-headline);
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* ── Tags / pills ─────────────────────────── */
+.tag {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(71,43,164,0.45);
+  color: var(--gl-lilac);
+  border: 1px solid rgba(209,193,255,0.18);
+}
+
+/* ── List items ───────────────────────────── */
+.li {
+  display: flex; align-items: flex-start; gap: 7px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.82);
+}
+.li::before { content: '›'; color: var(--gl-orange); font-weight: 700; flex-shrink: 0; margin-top: 0px; }
+
+/* ── Internal stamp ───────────────────────── */
+.stamp {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #2C2B27;
+  color: rgba(209,193,255,0.7);
+  text-align: center;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-family: var(--gl-font-body);
+  letter-spacing: 1px;
+  z-index: 9999;
+  opacity: 0.9;
+}
+
+/* ── Back to app link ─────────────────────── */
+.back-link {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 300;
+  background: rgba(10,6,32,0.88);
+  border: 1px solid rgba(209,193,255,0.18);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: var(--gl-lilac);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  backdrop-filter: blur(14px);
+  transition: all 0.2s;
+}
+.back-link:hover {
+  background: rgba(255,131,0,0.18);
+  color: var(--gl-orange);
+}
+
+/* ── Empty state ──────────────────────────── */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+.empty-state h2 { color: var(--gl-lilac); }
+.empty-state p { color: rgba(255,255,255,0.5); max-width: 400px; }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="{{ url_for('main.dashboard') }}">← Back to App</a>
+
+<div id="progressBar"></div>
+<div class="dot-nav" id="dotNav"></div>
+
+<div class="deck" id="deck"></div>
+
+<div class="nav">
+  <button onclick="prevSlide()" title="Previous (←)">&#8592;</button>
+  <span class="slide-counter" id="slideCounter">1 / 1</span>
+  <button onclick="nextSlide()" title="Next (→)">&#8594;</button>
+</div>
+
+<div class="stamp">INTERNAL USE ONLY — Not approved for customer-facing distribution</div>
+
+<script>
+/* ================================================================
+   DATA — injected from Jinja
+   ================================================================ */
+const DATA = {{ data|tojson }};
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+function fmt(n) {
+  return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+function fmtFull(n) {
+  return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtFTE(n) {
+  return Number(n).toFixed(2);
+}
+
+/* ================================================================
+   SLIDE BUILDERS
+   ================================================================ */
+
+function slideTitle() {
+  const grandTotal = DATA.grand_total || 0;
+  const totalVendor = DATA.total_vendor_spend || 0;
+  const totalLabor = DATA.total_labor || 0;
+  const totalFTE = DATA.total_fte || 0;
+  const svcCount = (DATA.services || []).length;
+
+  return `
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:4px;">
+        <div style="width:40px;height:3px;background:linear-gradient(90deg,#FF8300,#F7B334);border-radius:2px;"></div>
+        <span style="font-family:var(--gl-font-headline);font-size:11px;letter-spacing:3px;color:var(--gl-lilac);text-transform:uppercase;opacity:0.8;">GoodLeap · Employee Technology Enablement</span>
+      </div>
+      <h1>IT <span class="accent">Service</span><br>Catalog</h1>
+      <p style="font-size:16px;color:rgba(255,255,255,0.65);max-width:460px;line-height:1.6;">
+        A guide to services provided by the ETE team — infrastructure, support, productivity, and beyond.
+      </p>
+      ${DATA.latest_period ? `<span class="tag" style="align-self:flex-start;">Latest snapshot: ${DATA.latest_period}</span>` : ''}
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">Generated: ${DATA.generated_at}</div>
+    </div>
+    <div style="display:flex;gap:28px;padding-top:20px;border-top:1px solid rgba(209,193,255,0.12);flex-wrap:wrap;">
+      <div class="stat">
+        <span class="value">${DATA.employee_count || 0}</span>
+        <span class="label">Employees · ${DATA.contractor_count || 0} Contractors</span>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+      <div class="stat">
+        <span class="value">${svcCount}</span>
+        <span class="label">Services</span>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+      <div class="stat">
+        <span class="value">${DATA.vendor_count || 0}</span>
+        <span class="label">Vendors</span>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+      <div class="stat">
+        <span class="value" style="font-size:20px;">${fmt(totalVendor)}</span>
+        <span class="label">Vendor Spend</span>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+      <div class="stat">
+        <span class="value" style="font-size:20px;">${fmt(grandTotal)}</span>
+        <span class="label">Total Run Rate</span>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+      <div class="stat">
+        <span class="value" style="font-size:20px;color:var(--gl-lilac);">${fmtFTE(totalFTE)} FTE</span>
+        <span class="label">Headcount</span>
+      </div>
+    </div>`;
+}
+
+function slideOverview() {
+  const services = DATA.services || [];
+  if (services.length === 0) {
+    return `
+      <div class="empty-state">
+        <h2>No Services Yet</h2>
+        <p>Add services and link resources to see them appear in the export deck.</p>
+      </div>`;
+  }
+
+  // Group services by sort_order bands (simple grouping)
+  // Since we don't have categories in the DB, group by sort_order ranges or just list all
+  return `
+    <div style="margin-bottom:20px;">
+      <div class="section-label">Service Catalog</div>
+      <h2>ETE — <span class="accent">All Services</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:14px;flex:1;align-content:start;overflow-y:auto;">
+      ${services.map(s => `
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:border-color .15s;"
+             onmouseover="this.style.borderColor='rgba(255,131,0,0.5)'"
+             onmouseout="this.style.borderColor='rgba(209,193,255,0.25)'"
+             onclick="goToService(${s.id})">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="badge" style="width:32px;height:32px;min-width:32px;font-size:14px;border-radius:8px;">${s.id}</div>
+            <div style="flex:1;">
+              <div style="font-size:15px;font-weight:700;color:#fff;line-height:1.3;">${s.name}</div>
+              <div style="font-size:12px;color:var(--gl-lilac);margin-top:3px;">
+                ${fmtFTE(s.total_fte)} FTE &nbsp;·&nbsp; ${fmt(s.total_cost)}
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,0.07);">
+            <div style="flex:1;">
+              <div style="font-size:11px;color:rgba(255,255,255,0.4);">Vendor</div>
+              <div style="font-size:13px;font-weight:600;color:var(--gl-orange);">${fmt(s.vendor_spend)}</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:11px;color:rgba(255,255,255,0.4);">Labor</div>
+              <div style="font-size:13px;font-weight:600;color:var(--gl-lilac);">${fmt(s.labor_cost)}</div>
+            </div>
+            <div style="flex:1;text-align:right;">
+              <div style="font-size:11px;color:rgba(255,255,255,0.4);">Total</div>
+              <div style="font-size:14px;font-weight:700;color:var(--gl-yellow);">${fmt(s.total_cost)}</div>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function slideFinancials() {
+  const services = DATA.services || [];
+  const costCenters = DATA.cost_centers || [];
+
+  if (services.length === 0) {
+    return `
+      <div class="empty-state">
+        <h2>No Financial Data</h2>
+        <p>Link resources to services to see cost breakdowns.</p>
+      </div>`;
+  }
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="section-label">Financial Summary</div>
+        <h2>ETE — IT <span class="accent">Run Rate</span></h2>
+      </div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <div class="stat"><span class="value">${DATA.employee_count || 0}</span><span class="label">Employees</span></div>
+        <div class="stat"><span class="value">${DATA.contractor_count || 0}</span><span class="label">Contractors</span></div>
+        <div class="stat"><span class="value" style="font-size:18px;">${fmt(DATA.total_vendor_spend || 0)}</span><span class="label">Vendor</span></div>
+        <div class="stat"><span class="value" style="font-size:18px;color:var(--gl-lilac);">${fmt(DATA.total_labor || 0)}</span><span class="label">Labor</span></div>
+        <div class="stat"><span class="value" style="font-size:18px;color:var(--gl-yellow);">${fmt(DATA.grand_total || 0)}</span><span class="label">Total</span></div>
+        <div class="stat"><span class="value" style="font-size:18px;color:var(--gl-teal,#64D2FF);">${fmtFTE(DATA.total_fte || 0)}</span><span class="label">FTE</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:8px;margin-bottom:14px;">
+      ${services.map(s => `
+        <div class="card" style="cursor:pointer;padding:11px 13px;transition:border-color .15s;"
+             onmouseover="this.style.borderColor='rgba(255,131,0,0.5)'"
+             onmouseout="this.style.borderColor='rgba(209,193,255,0.25)'"
+             onclick="goToService(${s.id})">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+            <div class="badge" style="width:22px;height:22px;min-width:22px;font-size:11px;border-radius:6px;">${s.id}</div>
+            <span style="font-size:13px;font-weight:700;color:var(--gl-lilac);line-height:1.25;">${s.name}</span>
+          </div>
+          <div style="font-family:var(--gl-font-headline);font-size:17px;font-weight:700;color:var(--gl-orange);">${fmt(s.vendor_spend)}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);">Vendor</div>
+          <div style="font-family:var(--gl-font-headline);font-size:15px;font-weight:600;color:var(--gl-lilac);margin-top:3px;">${fmt(s.labor_cost)}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);">Labor</div>
+          <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;font-weight:700;color:var(--gl-yellow);">${fmtFTE(s.total_fte)} FTE</span>
+            <span style="font-size:14px;font-weight:700;color:var(--gl-orange);">${fmt(s.total_cost)}</span>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    ${costCenters.length > 0 ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="card">
+        <div class="section-label" style="margin-bottom:8px;">Cost by Cost Center</div>
+        ${costCenters.map(cc => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:14px;color:var(--gl-lilac);">${cc.name}</span>
+            <span style="font-size:14px;font-weight:700;color:var(--gl-orange);">${fmt(cc.total_cost)}</span>
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="section-label" style="margin-bottom:8px;">Headcount by Cost Center</div>
+        ${costCenters.map(cc => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:14px;color:var(--gl-lilac);">${cc.name}</span>
+            <span style="font-size:14px;font-weight:700;color:var(--gl-lilac);">${fmtFTE(cc.total_fte)} FTE</span>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}`;
+}
+
+function slideService(s) {
+  const totalFTE = s.emp_fte + (s.ctr_fte || 0);
+  return `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap;">
+      <div class="badge" style="width:48px;height:48px;font-size:20px;border-radius:13px;flex-shrink:0;">${s.id}</div>
+      <div style="flex:1;min-width:0;">
+        <h2 style="font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.name}</h2>
+      </div>
+      <div style="display:flex;gap:18px;flex-shrink:0;flex-wrap:wrap;">
+        <div class="stat">
+          <span class="value">${fmtFTE(totalFTE)}</span>
+          <span class="label">${fmtFTE(s.emp_fte)} Emp + ${fmtFTE(s.ctr_fte || 0)} Ctr</span>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+        <div class="stat">
+          <span class="value" style="font-size:18px;">${fmt(s.vendor_spend)}</span>
+          <span class="label">Vendor Spend</span>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+        <div class="stat">
+          <span class="value" style="font-size:18px;color:var(--gl-lilac);">${fmt(s.labor_cost)}</span>
+          <span class="label">Labor Cost</span>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.08);"></div>
+        <div class="stat">
+          <span class="value" style="font-size:18px;color:var(--gl-yellow);">${fmt(s.total_cost)}</span>
+          <span class="label">Total Cost</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:grid;grid-template-columns:1.15fr 0.95fr 0.9fr;gap:12px;min-height:0;">
+      <div class="card-accent" style="display:flex;flex-direction:column;overflow:hidden;">
+        <div class="section-label" style="margin-bottom:8px;">Service Description</div>
+        <p style="font-size:14px;line-height:1.65;color:rgba(255,255,255,0.82);margin-bottom:14px;">${s.description || 'No description provided.'}</p>
+        <div style="margin-top:auto;">
+          <div class="section-label" style="margin-bottom:7px;">Cost Drivers</div>
+          ${s.cost_drivers.length > 0
+            ? s.cost_drivers.map(d => `<div class="li">${d}</div>`).join('')
+            : '<div style="font-size:13px;color:rgba(255,255,255,0.4);">No cost drivers defined.</div>'}
+        </div>
+      </div>
+
+      <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+        <div class="section-label" style="margin-bottom:8px;">Service Deliverables</div>
+        ${s.deliverables.length > 0
+          ? s.deliverables.map(d => `<div class="li">${d}</div>`).join('')
+          : '<div style="font-size:13px;color:rgba(255,255,255,0.4);">No deliverables defined.</div>'}
+      </div>
+
+      <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+        <div class="section-label" style="margin-bottom:8px;">Technology Stack</div>
+        ${s.tools.length > 0
+          ? `<div style="display:flex;flex-wrap:wrap;gap:5px;">
+              ${s.tools.map(t => `<span class="tag" style="font-size:13px;">${t}</span>`).join('')}
+             </div>`
+          : '<div style="font-size:13px;color:rgba(255,255,255,0.4);">No tools associated.</div>'}
+
+        ${s.resources.length > 0 ? `
+        <div style="margin-top:14px;">
+          <div class="section-label" style="margin-bottom:7px;">Linked Resources</div>
+          ${s.resources.map(r => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="color:var(--gl-lilac);">${r.name} <span style="color:rgba(255,255,255,0.3);">(${r.kind})</span></span>
+              <span style="color:var(--gl-orange);font-weight:600;">${fmt(r.amount)}</span>
+            </div>`).join('')}
+        </div>` : ''}
+      </div>
+    </div>`;
+}
+
+function slideTechStack() {
+  const services = DATA.services || [];
+  // Collect all unique tools across all services
+  const allTools = {};
+  services.forEach(s => {
+    if (s.tools && s.tools.length > 0) {
+      allTools[s.name] = s.tools;
+    }
+  });
+
+  const toolSections = Object.entries(allTools);
+  if (toolSections.length === 0) {
+    return `
+      <div class="empty-state">
+        <h2>No Tech Stack Data</h2>
+        <p>Add tools to services to see them appear here.</p>
+      </div>`;
+  }
+
+  return `
+    <div style="margin-bottom:18px;">
+      <div class="section-label">Technology</div>
+      <h2>ETE <span class="accent">Tech Stack</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;flex:1;align-content:start;overflow-y:auto;">
+      ${toolSections.map(([svcName, tools]) => `
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:15px;font-weight:700;color:var(--gl-lilac);">${svcName}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${tools.map(t => `<span class="tag" style="font-size:13px;padding:5px 12px;">${t}</span>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ================================================================
+   SLIDE REGISTRY
+   ================================================================ */
+function buildSlides() {
+  const slides = [
+    { id: 'title',      html: slideTitle()     },
+    { id: 'overview',   html: slideOverview()  },
+    { id: 'financials', html: slideFinancials() },
+  ];
+
+  (DATA.services || []).forEach(s => {
+    slides.push({ id: `svc-${s.id}`, html: slideService(s) });
+  });
+
+  slides.push({ id: 'techstack', html: slideTechStack() });
+  return slides;
+}
+
+/* ================================================================
+   RENDER ENGINE
+   ================================================================ */
+let slides = [];
+let current = 0;
+
+function render() {
+  slides = buildSlides();
+  const deck = document.getElementById('deck');
+
+  deck.innerHTML = slides.map((s, i) => `
+    <div class="slide${i === 0 ? ' active' : ''}" data-i="${i}" data-id="${s.id}">
+      ${s.html}
+    </div>`).join('');
+
+  document.getElementById('dotNav').innerHTML = slides.map((_, i) => `
+    <div class="dot${i === 0 ? ' active' : ''}" onclick="goTo(${i})" title="Slide ${i+1}"></div>`).join('');
+
+  document.getElementById('slideCounter').textContent = `1 / ${slides.length}`;
+  updateProgress();
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= slides.length || idx === current) return;
+  const all = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.dot');
+
+  all[current].classList.remove('active');
+  if (idx > current) all[current].classList.add('exit-left');
+  current = idx;
+  all[current].classList.remove('exit-left');
+  all[current].classList.add('active');
+
+  setTimeout(() => all.forEach(s => { if (!s.classList.contains('active')) s.classList.remove('exit-left'); }), 360);
+
+  dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  document.getElementById('slideCounter').textContent = `${current + 1} / ${slides.length}`;
+  updateProgress();
+}
+
+function nextSlide() { goTo(current + 1); }
+function prevSlide() { goTo(current - 1); }
+
+function goToService(id) {
+  const idx = slides.findIndex(s => s.id === `svc-${id}`);
+  if (idx >= 0) goTo(idx);
+}
+
+function updateProgress() {
+  document.getElementById('progressBar').style.width = ((current + 1) / slides.length * 100) + '%';
+}
+
+document.addEventListener('keydown', e => {
+  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); nextSlide(); }
+  if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+  if (e.key === 'Home') goTo(0);
+  if (e.key === 'End')  goTo(slides.length - 1);
+});
+
+// Touch/swipe support
+let touchX = null;
+document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) dx < 0 ? nextSlide() : prevSlide();
+  touchX = null;
+});
+
+// Initialize
+render();
+</script>
+</body>
+</html>

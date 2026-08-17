@@ -63,6 +63,14 @@
         Tools
       </a>
 
+      <div class="sidebar-section-label">Export</div>
+      <a class="sidebar-link {% if request.endpoint and request.endpoint.startswith('export.') %}active{% endif %}" href="{{ url_for('export.catalog_view') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 11h-1m-1 1l-3 3m-6 0a3 3 0 00-6 0v3a3 3 0 003 3h12a3 3 0 003-3v-3a3 3 0 00-3-3m-6 0V6a3 3 0 00-3-3h-3a3 3 0 00-3 3v6a3 3 0 003 3h3a3 3 0 003-3m0 0V3"/>
+        </svg>
+        Export HTML
+      </a>
+
       <div class="sidebar-section-label">Analytics</div>
       <a class="sidebar-link {% if request.endpoint and request.endpoint.startswith('timepoints.') %}active{% endif %}" href="{{ url_for('timepoints.list_') }}">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
