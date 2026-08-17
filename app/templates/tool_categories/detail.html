@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Tool Category</div>
+    <h1>{{ category.name }}</h1>
+    {% if category.description %}
+    <p class="page-subtitle">{{ category.description }}</p>
+    {% endif %}
+  </div>
+  <div class="entity-actions">
+    <a class="btn btn-secondary" href="{{ url_for('tool_categories.edit', cid=category.id) }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
+      </svg>
+      Edit
+    </a>
+    <a class="btn btn-ghost" href="{{ url_for('tool_categories.list_') }}">All Categories</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="card">
+    <div class="section-label" style="margin-bottom:12px;">Details</div>
+    <table class="detail-table">
+      <tr><th>Name</th><td>{{ category.name }}</td></tr>
+      <tr><th>Description</th><td>
+        {% if category.description %}
+          <p>{{ category.description }}</p>
+        {% else %}
+          <span class="muted">No description</span>
+        {% endif %}
+      </td></tr>
+      <tr><th>Sort Order</th><td><code>{{ category.sort_order }}</code></td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Tools in this Category</div>
+  {% if category.tools %}
+  <div class="tag-cloud">
+    {% for t in category.tools %}
+      <span class="tag{% if t.id == tool.id if 'tool' in globals() else '' %} tag-active{% if t.id == tool.id if 'tool' in globals() else '' %}">
+        <a href="{{ url_for('tools.detail', tid=t.id) }}" style="color:inherit;text-decoration:none;">{{ t.name }}</a>
+      </span>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">No tools assigned to this category yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

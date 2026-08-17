@@ -62,6 +62,12 @@
         </svg>
         Tools
       </a>
+      <a class="sidebar-link {% if request.endpoint and request.endpoint.startswith('tool_categories.') %}active{% endif %}" href="{{ url_for('tool_categories.list_') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h7.5m-7.5 3h7.5m-7.5 3h7.5m-7.5 3h7.5m-7.5 3h7.5"/>
+        </svg>
+        Tool Categories
+      </a>
 
       <div class="sidebar-section-label">Export</div>
       <a class="sidebar-link {% if request.endpoint and request.endpoint.startswith('export.') %}active{% endif %}" href="{{ url_for('export.catalog_view') }}">

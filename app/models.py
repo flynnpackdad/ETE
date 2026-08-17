@@ -157,6 +157,8 @@ class Vendor(Resource):
     # Contractors roll up to a vendor.
     contractors = db.relationship("Contractor", back_populates="vendor",
                                   cascade="all, delete-orphan")
+    # Tools associated with this vendor
+    tools = db.relationship("Tool", back_populates="vendor")
 
     @property
     def all_up_cost(self):
@@ -182,17 +184,41 @@ class Employee(Resource):
 
 
 # ---------------------------------------------------------------------------
+# ToolCategory (CRUD-able categories for tools, e.g., Hardware, Software, Circuit)
+# ---------------------------------------------------------------------------
+class ToolCategory(db.Model):
+    __tablename__ = "tool_categories"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    sort_order = db.Column(db.Integer, default=0)
+
+    # Tools in this category
+    tools = db.relationship("Tool", back_populates="category")
+    def __repr__(self):
+        return f"<ToolCategory {self.name}>"
+
+
+# ---------------------------------------------------------------------------
 # Tool (associates to services, M:1-ish)
 # ---------------------------------------------------------------------------
 class Tool(db.Model):
     __tablename__ = "tools"
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     service_id = db.Column(db.Integer, db.ForeignKey("services.id"),
                            nullable=True)
     service = db.relationship("Service", back_populates="tools")
+    vendor_id = db.Column(db.Integer, db.ForeignKey("resources.id"),
+                          nullable=True)
+    vendor = db.relationship("Vendor", back_populates="tools")
 
+    # Budget projection fields
+    category_id = db.Column(db.Integer, db.ForeignKey("tool_categories.id"), nullable=True)
+    category = db.relationship("ToolCategory", back_populates="tools")
+    projected_cost = db.Column(db.Float, default=0.0)
+    cost_type = db.Column(db.String(20), default="one_time")  # "one_time" | "recurring_monthly" | "recurring_annual"
     def __repr__(self):
         return f"<Tool {self.name}>"
 
@@ -259,3 +285,4 @@ class TimePoint(db.Model):
 
     def __repr__(self):
         return f"<TimePoint link={self.link_id} {self.period} ${self.amount}>"
+

@@ -28,6 +28,7 @@
     <table class="detail-table">
       <tr><th>Cost Center</th><td>{{ vendor.cost_center.name if vendor.cost_center else '—' }}</td></tr>
       <tr><th>Contractors</th><td>{{ vendor.contractors|length }}</td></tr>
+      <tr><th>Tools</th><td>{{ vendor.tools|length }}</td></tr>
       <tr><th>All-Up Cost</th><td>${% if vendor.all_up_cost %}{{ "%.2f"|format(vendor.all_up_cost) }}{% else %}0.00{% endif %}</td></tr>
     </table>
   </div>
@@ -51,6 +52,19 @@
         <span>{{ 'Active' if c.is_active else 'Inactive' }}</span>
       </div>
     </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if vendor.tools %}
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Tools</div>
+  <div class="tag-cloud">
+    {% for t in vendor.tools %}
+    <span class="tag{% if not t.is_active %} tag-inactive{% endif %}">
+      <a href="{{ url_for('tools.detail', tid=t.id) }}" style="color:inherit;text-decoration:none;">{{ t.name }}</a>
+    </span>
     {% endfor %}
   </div>
 </div>

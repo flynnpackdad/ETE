@@ -6,9 +6,10 @@ Contractors roll up to vendors.
 """
 from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
+from sqlalchemy.orm import joinedload
 
 from . import db
-from .models import Vendor, CostCenter, Service
+from .models import Vendor, CostCenter, Service, Tool
 from .forms import VendorForm
 
 bp = Blueprint("vendors", __name__)
@@ -29,7 +30,7 @@ def require_login():
 
 @bp.route("/vendors")
 def list_():
-    vendors = Vendor.query.order_by(Vendor.name).all()
+    vendors = db.session.query(Vendor).options(joinedload(Vendor.tools)).order_by(Vendor.name).all()
     return render_template("vendors/list.html", vendors=vendors)
 
 
@@ -53,7 +54,7 @@ def create():
 
 @bp.route("/vendors/<int:vid>")
 def detail(vid):
-    vendor = db.session.get(Vendor, vid) or abort(404)
+    vendor = db.session.query(Vendor).options(joinedload(Vendor.tools)).get(vid) or abort(404)
     return render_template(
         "vendors/detail.html", vendor=vendor,
         services=Service.query.order_by(Service.name).all(),

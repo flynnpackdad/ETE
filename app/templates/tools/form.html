@@ -22,6 +22,30 @@
     {% for e in form.service_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
   </label>
 
+  <label class="field">
+    {{ form.vendor_id.label }}
+    {{ form.vendor_id(class_="input") }}
+    {% for e in form.vendor_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.category_id.label }}
+    {{ form.category_id(class_="input") }}
+    {% for e in form.category_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.projected_cost.label }}
+    {{ form.projected_cost(class_="input", placeholder="e.g. 1500.00") }}
+    {% for e in form.projected_cost.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.cost_type.label }}
+    {{ form.cost_type(class_="input") }}
+    {% for e in form.cost_type.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
   <div class="form-actions">
     <button type="submit" class="btn btn-primary btn-lg">Save Tool</button>
     <a class="btn btn-secondary" href="{{ url_for('tools.list_') }}">Cancel</a>
