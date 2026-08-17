@@ -37,6 +37,7 @@ def create_app(config_object=Config):
     from .employees import bp as employees_bp
     from .links import bp as links_bp
     from .tools import bp as tools_bp
+    from .tool_categories import bp as tool_categories_bp
     from .timepoints import bp as timepoints_bp
     from .export import bp as export_bp
 
@@ -49,6 +50,7 @@ def create_app(config_object=Config):
     app.register_blueprint(employees_bp)
     app.register_blueprint(links_bp)
     app.register_blueprint(tools_bp)
+    app.register_blueprint(tool_categories_bp)
     app.register_blueprint(timepoints_bp)
     app.register_blueprint(export_bp)
 

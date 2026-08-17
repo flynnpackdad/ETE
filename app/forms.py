@@ -77,6 +77,42 @@ class ToolForm(FlaskForm):
     service_id = SelectField(
         "Service (optional)", coerce=int, validators=[Optional()]
     )
+    vendor_id = SelectField(
+        "Vendor (optional)", coerce=int, validators=[Optional()]
+    )
+    category_id = SelectField(
+        "Category (optional)", coerce=int, validators=[Optional()]
+    )
+    projected_cost = FloatField(
+        "Projected Cost ($)", validators=[Optional(), NumberRange(min=0)],
+        default=0.0,
+    )
+    cost_type = SelectField(
+        "Cost Type", coerce=str, validators=[Optional()],
+        choices=[
+            ("", "—"),
+            ("one_time", "One-time (Capex)"),
+            ("recurring_monthly", "Recurring (Monthly)"),
+            ("recurring_annual", "Recurring (Annual)"),
+        ],
+        default="one_time",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate category choices dynamically
+        from .models import ToolCategory
+        self.category_id.choices = [
+            (0, "--- Unassigned ---")
+        ] + [
+            (c.id, c.name) for c in ToolCategory.query.order_by(ToolCategory.sort_order, ToolCategory.name).all()
+        ]
+
+
+class ToolCategoryForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    description = TextAreaField("Description", validators=[Optional()])
+    sort_order = IntegerField("Sort Order", validators=[Optional()], default=0)
 
 
 class ResourceServiceLinkForm(FlaskForm):
@@ -93,13 +129,6 @@ class ResourceServiceLinkForm(FlaskForm):
     current_fte = FloatField(
         "FTE Allocation", validators=[Optional(), NumberRange(min=0)],
         default=0.0,
-    )
-
-
-class ToolForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    service_id = SelectField(
-        "Service (optional)", coerce=int, validators=[Optional()]
     )
 
 
@@ -125,3 +154,4 @@ class PeriodSnapshotForm(FlaskForm):
     period = SelectField(
         "Period", coerce=str, validators=[DataRequired()],
     )
+

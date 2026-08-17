@@ -30,6 +30,34 @@
           <span class="muted">Unassigned</span>
         {% endif %}
       </td></tr>
+      <tr><th>Vendor</th><td>
+        {% if tool.vendor %}
+          <a href="{{ url_for('vendors.detail', vid=tool.vendor.id) }}">{{ tool.vendor.name }}</a>
+        {% else %}
+          <span class="muted">Unassigned</span>
+        {% endif %}
+      </td></tr>
+      <tr><th>Category</th><td>
+        {% if tool.category %}
+          <span class="tag">{{ tool.category.name }}</span>
+        {% else %}
+          <span class="muted">Unassigned</span>
+{% endif %}
+      </td></tr>
+      <tr><th>Cost Type</th><td>
+        {% if tool.cost_type %}
+          {% if tool.cost_type == "one_time" %}One-time (Capex){% elif tool.cost_type == "recurring_monthly" %}Recurring (Monthly){% elif tool.cost_type == "recurring_annual" %}Recurring (Annual){% else %}{{ tool.cost_type }}{% endif %}
+        {% else %}
+          <span class="muted">Unassigned</span>
+      {% endif %}
+      </td></tr>
+      <tr><th>Projected Cost</th><td>
+        {% if tool.projected_cost > 0 %}
+          <strong>${{ "{:,.2f}".format(tool.projected_cost) }}</strong>
+        {% else %}
+          <span class="muted">Unassigned</span>
+        {% endif %}
+      </td></tr>
     </table>
   </div>
 </div>
@@ -40,6 +68,19 @@
   <div class="tag-cloud">
     {% for t in tool.service.tools %}
       <span class="tag{% if t.id == tool.id %} tag-active{% endif %}">{{ t.name }}</span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if tool.vendor %}
+<div class="card" style="margin-top:16px;">
+  <div class="section-label" style="margin-bottom:12px;">Other Tools from {{ tool.vendor.name }}</div>
+  <div class="tag-cloud">
+    {% for t in tool.vendor.tools %}
+      {% if t.id != tool.id %}
+        <span class="tag"><a href="{{ url_for('tools.detail', tid=t.id) }}" style="color:inherit;text-decoration:none;">{{ t.name }}</a></span>
+      {% endif %}
     {% endfor %}
   </div>
 </div>

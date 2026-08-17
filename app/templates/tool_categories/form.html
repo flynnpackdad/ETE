@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Tool Categories</div>
+  <h1>{{ title }}</h1>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.name.label }}
+    {{ form.name(class_="input", placeholder="e.g. Hardware, Software, Network Circuit") }}
+    {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.description.label }}
+    {{ form.description(class_="input", placeholder="Optional description...") }}
+    {% for e in form.description.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.sort_order.label }}
+    {{ form.sort_order(class_="input", placeholder="e.g. 0, 1, 2... (lower sorts first)") }}
+    {% for e in form.sort_order.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">Save Category</button>
+    <a class="btn btn-secondary" href="{{ url_for('tool_categories.list_') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

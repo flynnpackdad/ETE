@@ -24,6 +24,10 @@
         <th style="width:50px;">#</th>
         <th>Tool</th>
         <th>Service</th>
+        <th>Vendor</th>
+        <th>Category</th>
+        <th class="right">Cost Type</th>
+        <th class="right" style="width:120px;">Projected Cost</th>
         <th class="right" style="width:200px;">Actions</th>
       </tr>
     </thead>
@@ -39,6 +43,34 @@
             <a href="{{ url_for('services.detail', sid=t.service.id) }}">{{ t.service.name }}</a>
           {% else %}
             <span class="muted">Unassigned</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if t.vendor %}
+            <a href="{{ url_for('vendors.detail', vid=t.vendor.id) }}">{{ t.vendor.name }}</a>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if t.category %}
+            <span class="tag">{{ t.category.name }}</span>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+        <td class="right">
+          {% if t.cost_type %}
+            <span class="tag tag-ghost">{% if t.cost_type == "one_time" %}Capex{% elif t.cost_type == "recurring_monthly" %}Monthly{% elif t.cost_type == "recurring_annual" %}Annual{% else %}{{ t.cost_type }}{% endif %}</span>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+        <td class="right">
+          {% if t.projected_cost > 0 %}
+            <span class="muted">${{ "{:,.2f}".format(t.projected_cost) }}</span>
+          {% else %}
+            <span class="muted">—</span>
           {% endif %}
         </td>
         <td class="right">

@@ -6,9 +6,10 @@ resources — and represent the technology stack supporting each service.
 """
 from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import login_required
+from sqlalchemy.orm import joinedload
 
 from . import db
-from .models import Tool, Service
+from .models import Tool, Service, Vendor, ToolCategory
 from .forms import ToolForm
 
 bp = Blueprint("tools", __name__)
@@ -23,6 +24,24 @@ def _populate_services(form):
     ]
 
 
+def _populate_vendors(form):
+    """Helper: fill the vendor_id dropdown."""
+    form.vendor_id.choices = [
+        (0, "--- Unassigned ---")
+    ] + [
+        (v.id, v.name) for v in Vendor.query.order_by(Vendor.name).all()
+    ]
+
+
+def _populate_categories(form):
+    """Helper: fill the category_id dropdown."""
+    form.category_id.choices = [
+        (0, "--- Unassigned ---")
+    ] + [
+        (c.id, c.name) for c in ToolCategory.query.order_by(ToolCategory.sort_order, ToolCategory.name).all()
+    ]
+
+
 @bp.before_request
 @login_required
 def require_login():
@@ -31,7 +50,7 @@ def require_login():
 
 @bp.route("/tools")
 def list_():
-    tools = Tool.query.order_by(Tool.name).all()
+    tools = db.session.query(Tool).options(joinedload(Tool.vendor), joinedload(Tool.category)).order_by(Tool.name).all()
     return render_template("tools/list.html", tools=tools)
 
 
@@ -39,11 +58,19 @@ def list_():
 def create():
     form = ToolForm()
     _populate_services(form)
+    _populate_vendors(form)
+    _populate_categories(form)
     if form.validate_on_submit():
         service_id = form.service_id.data or None
+        vendor_id = form.vendor_id.data or None
+        category_id = form.category_id.data or None
         tool = Tool(
             name=form.name.data.strip(),
             service_id=service_id,
+            vendor_id=vendor_id,
+            category_id=category_id,
+            projected_cost=form.projected_cost.data or 0.0,
+            cost_type=form.cost_type.data or "one_time",
         )
         db.session.add(tool)
         db.session.commit()
@@ -63,9 +90,15 @@ def edit(tid):
     tool = db.session.get(Tool, tid) or abort(404)
     form = ToolForm(obj=tool)
     _populate_services(form)
+    _populate_vendors(form)
+    _populate_categories(form)
     if form.validate_on_submit():
         tool.name = form.name.data.strip()
         tool.service_id = form.service_id.data or None
+        tool.vendor_id = form.vendor_id.data or None
+        tool.category_id = form.category_id.data or None
+        tool.projected_cost = form.projected_cost.data or 0.0
+        tool.cost_type = form.cost_type.data or "one_time"
         db.session.commit()
         flash(f"Tool '{tool.name}' updated.", "success")
         return redirect(url_for("tools.detail", tid=tool.id))
