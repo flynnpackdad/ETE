@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Tools</div>
+  <h1>{{ title }}</h1>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.name.label }}
+    {{ form.name(class_="input", placeholder="e.g. Kubernetes, ServiceNow, Terraform") }}
+    {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
+    {{ form.service_id.label }}
+    {{ form.service_id(class_="input") }}
+    {% for e in form.service_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">Save Tool</button>
+    <a class="btn btn-secondary" href="{{ url_for('tools.list_') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

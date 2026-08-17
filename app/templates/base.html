@@ -56,6 +56,12 @@
         </svg>
         Employees
       </a>
+      <a class="sidebar-link {% if request.endpoint and request.endpoint.startswith('tools.') %}active{% endif %}" href="{{ url_for('tools.list_') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17l-5.384 3.142 1.442-6.056L2.5 7.92l6.172-.527L11.42 2l2.748 5.393 6.172.527-4.978 4.336 1.442 6.056z"/>
+        </svg>
+        Tools
+      </a>
     </nav>
 
     <div class="sidebar-footer">
