@@ -72,6 +72,13 @@ class EmployeeForm(FlaskForm):
     is_active = BooleanField("Active", default=True)
 
 
+class ToolForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    service_id = SelectField(
+        "Service (optional)", coerce=int, validators=[Optional()]
+    )
+
+
 class ResourceServiceLinkForm(FlaskForm):
     resource_id = SelectField(
         "Resource", coerce=int, validators=[DataRequired()]
