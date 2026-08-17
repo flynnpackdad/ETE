@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Analytics</div>
+  <h1>{{ title }}</h1>
+  <p class="page-subtitle">Capture current costs and FTEs for all resource-service links in a single period.</p>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.period.label }}
+    {{ form.period(class_="input") }}
+    {% for e in form.period.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+    <span style="font-size:12px; color:var(--gray-500); margin-top:2px;">
+      Format: YYYY-QN (e.g. 2025-Q4). Existing snapshots for this period will be skipped.
+    </span>
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+      </svg>
+      Capture Snapshot
+    </button>
+    <a class="btn btn-secondary" href="{{ url_for('timepoints.list_') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

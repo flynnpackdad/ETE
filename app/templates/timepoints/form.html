@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="section-label">Time Points</div>
+  <h1>{{ title }}</h1>
+</div>
+
+<form method="post" class="card form-card">
+  {{ form.hidden_tag() }}
+
+  <label class="field">
+    {{ form.period.label }}
+    {{ form.period(class_="input") }}
+    {% for e in form.period.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <div class="field-row">
+    <label class="field">
+      {{ form.amount.label }}
+      {{ form.amount(class_="input", step="0.01") }}
+      {% for e in form.amount.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+    </label>
+    <label class="field">
+      {{ form.fte.label }}
+      {{ form.fte(class_="input", step="0.01") }}
+      {% for e in form.fte.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-lg">Save Snapshot</button>
+    {% if tp %}
+      <a class="btn btn-secondary" href="{{ url_for('timepoints.link_history', lid=tp.link_id) }}">Cancel</a>
+    {% elif link %}
+      <a class="btn btn-secondary" href="{{ url_for('timepoints.link_history', lid=link.id) }}">Cancel</a>
+    {% else %}
+      <a class="btn btn-secondary" href="{{ url_for('timepoints.list_') }}">Cancel</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Time Points · {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-head row">
+  <div>
+    <div class="section-label">Analytics</div>
+    <h1>Time Points</h1>
+    <p class="page-subtitle">Quarterly cost &amp; FTE snapshots for trending and analysis.</p>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <a class="btn btn-secondary btn-lg" href="{{ url_for('timepoints.period_snapshot') }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+      </svg>
+      Take Snapshot
+    </a>
+  </div>
+</div>
+
+{% if all_periods %}
+<div class="card" style="margin-bottom:16px; padding:12px 20px;">
+  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <span style="font-size:13px; font-weight:600; color:var(--gray-500);">Filter by period:</span>
+    <a href="{{ url_for('timepoints.list_') }}" class="tag{% if not active_period %} tag-active{% endif %}" style="text-decoration:none; cursor:pointer;">All</a>
+    {% for p in all_periods %}
+      <a href="{{ url_for('timepoints.list_', period=p) }}" class="tag{% if active_period == p %} tag-active{% endif %}" style="text-decoration:none; cursor:pointer;">{{ p }}</a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if timepoints %}
+<div class="card table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Period</th>
+        <th>Resource</th>
+        <th>Service</th>
+        <th class="right">Annual Cost</th>
+        <th class="right">FTE</th>
+        <th class="right" style="width:140px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tp in timepoints %}
+      {% set link = tp.link %}
+      <tr>
+        <td><span class="tag">{{ tp.period }}</span></td>
+        <td>
+          {% set r = link.resource %}
+          {% if r.kind == 'vendor' %}
+            <a href="{{ url_for('vendors.detail', vid=r.id) }}">{{ r.name }}</a>
+          {% elif r.kind == 'contractor' %}
+            <a href="{{ url_for('contractors.detail', cid=r.id) }}">{{ r.name }}</a>
+          {% else %}
+            <a href="{{ url_for('employees.detail', eid=r.id) }}">{{ r.name }}</a>
+          {% endif %}
+          <span class="muted" style="margin-left:4px;">({{ r.kind | title }})</span>
+        </td>
+        <td><a href="{{ url_for('services.detail', sid=link.service_id) }}">{{ link.service.name }}</a></td>
+        <td class="right">${% if tp.amount %}{{ "%.2f"|format(tp.amount) }}{% else %}0.00{% endif %}</td>
+        <td class="right">{% if tp.fte %}{{ "%.2f"|format(tp.fte) }}{% else %}—{% endif %}</td>
+        <td class="right">
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('timepoints.link_history', lid=link.id) }}">Trend</a>
+          <a class="btn btn-ghost btn-sm" href="{{ url_for('timepoints.edit', tpid=tp.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('timepoints.delete', tpid=tp.id) }}" class="inline"
+                onsubmit="return confirm('Delete this snapshot?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card placeholder-card">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="var(--gray-300)" style="margin-bottom:16px;">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
+  </svg>
+  <h2>No time points yet</h2>
+  <p>Take a period snapshot to capture current costs and FTEs for trending.</p>
+  <a class="btn btn-primary" href="{{ url_for('timepoints.period_snapshot') }}" style="margin-top:16px;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+    </svg>
+    Take Snapshot
+  </a>
+</div>
+{% endif %}
+{% endblock %}

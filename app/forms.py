@@ -2,7 +2,8 @@
 WTForms for the ETE Service Catalog.
 
 Phase 1: CostCenterForm, ServiceForm.
-Phase 2: VendorForm, ContractorForm, EmployeeForm, ResourceServiceLinkForm.
+Phase 2: VendorForm, ContractorForm, EmployeeForm, ResourceServiceLinkForm, ToolForm.
+Phase 3: TimePointForm, PeriodSnapshotForm.
 """
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -92,4 +93,35 @@ class ResourceServiceLinkForm(FlaskForm):
     current_fte = FloatField(
         "FTE Allocation", validators=[Optional(), NumberRange(min=0)],
         default=0.0,
+    )
+
+
+class ToolForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    service_id = SelectField(
+        "Service (optional)", coerce=int, validators=[Optional()]
+    )
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 — Time tracking forms
+# ---------------------------------------------------------------------------
+class TimePointForm(FlaskForm):
+    period = SelectField(
+        "Period", coerce=str, validators=[DataRequired()],
+        render_kw={"placeholder": "e.g. 2025-Q4"},
+    )
+    amount = FloatField(
+        "Annual Cost ($)", validators=[Optional(), NumberRange(min=0)],
+        default=0.0,
+    )
+    fte = FloatField(
+        "FTE", validators=[Optional(), NumberRange(min=0)],
+        default=0.0,
+    )
+
+
+class PeriodSnapshotForm(FlaskForm):
+    period = SelectField(
+        "Period", coerce=str, validators=[DataRequired()],
     )
