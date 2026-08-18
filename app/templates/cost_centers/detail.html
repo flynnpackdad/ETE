@@ -47,7 +47,7 @@
         <tr>
           <td><a href="{{ url_for('vendors.detail', vid=v.id) }}">{{ v.name }}</a></td>
           <td>{{ v.contractors|length }}</td>
-          <td class="right">${% if v.all_up_cost %}{{ "%.2f"|format(v.all_up_cost) }}{% else %}0.00{% endif %}</td>
+          <td class="right">${% if v.all_up_cost %}{{ "{:,.2f}".format(v.all_up_cost) }}{% else %}0.00{% endif %}</td>
           <td>{% if v.is_active %}<span class="tag tag-active">Active</span>{% else %}<span class="tag tag-inactive">Inactive</span>{% endif %}</td>
         </tr>
         {% endfor %}

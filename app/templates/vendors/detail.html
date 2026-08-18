@@ -28,7 +28,7 @@
     <table class="detail-table">
       <tr><th>Contractors</th><td>{{ vendor.contractors|length }}</td></tr>
       <tr><th>Tools</th><td>{{ vendor.tools|length }}</td></tr>
-      <tr><th>All-Up Cost</th><td>${% if vendor.all_up_cost %}{{ "%.2f"|format(vendor.all_up_cost) }}{% else %}0.00{% endif %}</td></tr>
+      <tr><th>All-Up Cost</th><td>${% if vendor.all_up_cost %}{{ "{:,.2f}".format(vendor.all_up_cost) }}{% else %}0.00{% endif %}</td></tr>
     </table>
   </div>
 

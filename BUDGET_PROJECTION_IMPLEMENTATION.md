@@ -183,3 +183,64 @@ Seed categories (run once):
 ```bash
 python3 -m app.seed_tool_categories
 ```
+---
+
+## Cost Roll-Up from Tools to Vendors
+
+### Overview
+
+The `Vendor.all_up_cost` property now calculates the total cost by summing:
+1. **Service Link Costs**: Sum of `current_amount` from all `ResourceServiceLink` objects for the vendor
+2. **Tool Costs**: Sum of `projected_cost` from all `Tool` objects associated with the vendor
+
+This means when you add a cost to a tool and associate it with a vendor, that cost will automatically roll up to the vendor's "All-Up Cost" field.
+
+### Implementation
+
+Modified `app/models.py`:
+
+```python
+class Vendor(Resource):
+    # ... existing code ...
+    
+    @property
+    def all_up_cost(self):
+        """Sum of current-period allocations across all service links plus tool costs."""
+        link_costs = sum(l.current_amount for l in self.links)
+        tool_costs = sum(t.projected_cost for t in self.tools)
+        return link_costs + tool_costs
+```
+
+### Example Queries
+
+#### Cost by Vendor (SQL)
+```sql
+SELECT 
+    v.name, 
+    SUM(COALESCE(l.current_amount, 0)) + SUM(COALESCE(t.projected_cost, 0)) as total_cost
+FROM resources v
+LEFT JOIN resource_service_links l ON v.id = l.resource_id
+LEFT JOIN tools t ON v.id = t.vendor_id
+WHERE v.kind = 'vendor'
+GROUP BY v.name
+ORDER BY total_cost DESC;
+```
+
+### Testing
+
+Run the app and verify vendor costs include tool costs:
+
+```bash
+cd /Users/deckard/Documents/GitHub/ETE
+.venv/bin/python -c "
+from app import create_app
+from app.models import Vendor, Tool
+
+app = create_app()
+
+with app.app_context():
+    vendors = Vendor.query.all()
+    for v in vendors:
+        print(f'{v.name}: \${v.all_up_cost:,.2f}')
+"
+```

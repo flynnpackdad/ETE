@@ -163,8 +163,10 @@ class Vendor(Resource):
 
     @property
     def all_up_cost(self):
-        """Sum of current-period allocations across all service links."""
-        return sum(l.current_amount for l in self.links)
+        """Sum of current-period allocations across all service links plus tool costs."""
+        link_costs = sum(l.current_amount for l in self.links)
+        tool_costs = sum(t.projected_cost for t in self.tools)
+        return link_costs + tool_costs
 
 
 class Contractor(Resource):
