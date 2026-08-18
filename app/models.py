@@ -68,6 +68,7 @@ class CostCenter(db.Model):
     vendors = db.relationship("Vendor", back_populates="cost_center")
     contractors = db.relationship("Contractor", back_populates="cost_center")
     employees = db.relationship("Employee", back_populates="cost_center")
+    tools = db.relationship("Tool", back_populates="cost_center")
 
     def __repr__(self):
         return f"<CostCenter {self.name}>"
@@ -162,8 +163,10 @@ class Vendor(Resource):
 
     @property
     def all_up_cost(self):
-        """Sum of current-period allocations across all service links."""
-        return sum(l.current_amount for l in self.links)
+        """Sum of current-period allocations across all service links plus tool costs."""
+        link_costs = sum(l.current_amount for l in self.links)
+        tool_costs = sum(t.projected_cost for t in self.tools)
+        return link_costs + tool_costs
 
 
 class Contractor(Resource):
@@ -213,6 +216,9 @@ class Tool(db.Model):
     vendor_id = db.Column(db.Integer, db.ForeignKey("resources.id"),
                           nullable=True)
     vendor = db.relationship("Vendor", back_populates="tools")
+    cost_center_id = db.Column(db.Integer, db.ForeignKey("cost_centers.id"),
+                               nullable=True)
+    cost_center = db.relationship("CostCenter", back_populates="tools")
 
     # Budget projection fields
     category_id = db.Column(db.Integer, db.ForeignKey("tool_categories.id"), nullable=True)

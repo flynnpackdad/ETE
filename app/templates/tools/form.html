@@ -29,6 +29,12 @@
   </label>
 
   <label class="field">
+    {{ form.cost_center_id.label }}
+    {{ form.cost_center_id(class_="input") }}
+    {% for e in form.cost_center_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+  </label>
+
+  <label class="field">
     {{ form.category_id.label }}
     {{ form.category_id(class_="input") }}
     {% for e in form.category_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}

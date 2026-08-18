@@ -15,13 +15,6 @@ from .forms import VendorForm
 bp = Blueprint("vendors", __name__)
 
 
-def _populate_cost_centers(form):
-    """Helper: fill the cost_center_id dropdown."""
-    form.cost_center_id.choices = [
-        (cc.id, cc.name) for cc in CostCenter.query.order_by(CostCenter.name).all()
-    ]
-
-
 @bp.before_request
 @login_required
 def require_login():
@@ -37,11 +30,9 @@ def list_():
 @bp.route("/vendors/new", methods=["GET", "POST"])
 def create():
     form = VendorForm()
-    _populate_cost_centers(form)
     if form.validate_on_submit():
         vendor = Vendor(
             name=form.name.data.strip(),
-            cost_center_id=form.cost_center_id.data,
             notes=form.notes.data,
             is_active=form.is_active.data,
         )
@@ -65,10 +56,8 @@ def detail(vid):
 def edit(vid):
     vendor = db.session.get(Vendor, vid) or abort(404)
     form = VendorForm(obj=vendor)
-    _populate_cost_centers(form)
     if form.validate_on_submit():
         vendor.name = form.name.data.strip()
-        vendor.cost_center_id = form.cost_center_id.data
         vendor.notes = form.notes.data
         vendor.is_active = form.is_active.data
         db.session.commit()

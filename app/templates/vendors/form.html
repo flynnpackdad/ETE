@@ -17,12 +17,6 @@
   </label>
 
   <label class="field">
-    {{ form.cost_center_id.label }}
-    {{ form.cost_center_id(class_="input") }}
-    {% for e in form.cost_center_id.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
-  </label>
-
-  <label class="field">
     {{ form.notes.label }}
     {{ form.notes(class_="input", rows=3, placeholder="Optional notes about this vendor") }}
   </label>

@@ -11,10 +11,10 @@ leadership-ready HTML presentation.
 - **CostCenter** — independent dimension (IT Ops, IT Engineering). Applies to resources only.
 - **Resources** (Vendor / Contractor / Employee) — each books to one CostCenter and links to many Services.
   - Contractors roll up to a Vendor (vendor holds all-up cost).
+  - Tools roll up to a Vendor (vendor holds tool costs via `projected_cost`).
 - **ResourceServiceLink** — joins a resource to a service and **carries the cost** (Option A). A vendor's all-up cost is split across its links.
 - **TimePoint** — quarterly cost/FTE snapshots per link, for trending.
-- **Tool** — associates to services.
-
+- **Tool** — associates to services and has a projected cost that rolls up to its vendor.
 ## Stack
 
 Flask · Jinja (server-rendered) · WTForms · SQLAlchemy · SQLite · Chart.js (trends, Phase 3)
@@ -30,4 +30,5 @@ Flask · Jinja (server-rendered) · WTForms · SQLAlchemy · SQLite · Chart.js 
 - [ ] **Phase 6** — (Later) multi-catalog growth
 
 ## Setup
+
 

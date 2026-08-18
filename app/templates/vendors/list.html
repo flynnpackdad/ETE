@@ -6,7 +6,7 @@
   <div>
     <div class="section-label">Resources</div>
     <h1>Vendors</h1>
-    <p class="page-subtitle">External suppliers. Each vendor is booked to a cost center.</p>
+    <p class="page-subtitle">External suppliers.</p>
   </div>
   <a class="btn btn-primary btn-lg" href="{{ url_for('vendors.create') }}">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -23,7 +23,6 @@
       <tr>
         <th style="width:50px;">#</th>
         <th>Vendor</th>
-        <th>Cost Center</th>
         <th>Contractors</th>
         <th class="right">All-Up Cost</th>
         <th style="width:120px;">Status</th>
@@ -37,9 +36,8 @@
         <td>
           <a class="svc-link" href="{{ url_for('vendors.detail', vid=v.id) }}">{{ v.name }}</a>
         </td>
-        <td>{{ v.cost_center.name if v.cost_center else '<span class="muted">—</span>' | safe }}</td>
         <td>{{ v.contractors|length }}</td>
-        <td class="right">${% if v.all_up_cost %}{{ "%.2f"|format(v.all_up_cost) }}{% else %}0.00{% endif %}</td>
+        <td class="right">${% if v.all_up_cost %}{{ "{:,.2f}".format(v.all_up_cost) }}{% else %}0.00{% endif %}</td>
         <td>
           {% if v.is_active %}
             <span class="tag tag-active">Active</span>
@@ -77,3 +75,4 @@
 </div>
 {% endif %}
 {% endblock %}
+
