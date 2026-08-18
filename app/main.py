@@ -86,8 +86,8 @@ def dashboard():
         })
 
     # --- Grand totals ---
-    grand_total_cost = sum(sc.total_cost for sc in service_rows)
-    grand_total_fte = sum(sc.total_fte for sc in service_rows)
+    grand_total_cost = sum(sc["total_cost"] for sc in service_rows)
+    grand_total_fte = sum(sc["total_fte"] for sc in service_rows)
 
     # --- Latest snapshot period (if any) ---
     latest_tp = TimePoint.query.order_by(TimePoint.period.desc()).first()
