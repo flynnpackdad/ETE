@@ -26,7 +26,6 @@
   <div class="card">
     <div class="section-label" style="margin-bottom:12px;">Details</div>
     <table class="detail-table">
-      <tr><th>Cost Center</th><td>{{ vendor.cost_center.name if vendor.cost_center else '—' }}</td></tr>
       <tr><th>Contractors</th><td>{{ vendor.contractors|length }}</td></tr>
       <tr><th>Tools</th><td>{{ vendor.tools|length }}</td></tr>
       <tr><th>All-Up Cost</th><td>${% if vendor.all_up_cost %}{{ "%.2f"|format(vendor.all_up_cost) }}{% else %}0.00{% endif %}</td></tr>

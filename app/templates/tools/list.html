@@ -25,6 +25,7 @@
         <th>Tool</th>
         <th>Service</th>
         <th>Vendor</th>
+        <th>Cost Center</th>
         <th>Category</th>
         <th class="right">Cost Type</th>
         <th class="right" style="width:120px;">Projected Cost</th>
@@ -48,6 +49,13 @@
         <td>
           {% if t.vendor %}
             <a href="{{ url_for('vendors.detail', vid=t.vendor.id) }}">{{ t.vendor.name }}</a>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if t.cost_center %}
+            <span class="tag">{{ t.cost_center.name }}</span>
           {% else %}
             <span class="muted">—</span>
           {% endif %}

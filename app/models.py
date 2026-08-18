@@ -68,6 +68,7 @@ class CostCenter(db.Model):
     vendors = db.relationship("Vendor", back_populates="cost_center")
     contractors = db.relationship("Contractor", back_populates="cost_center")
     employees = db.relationship("Employee", back_populates="cost_center")
+    tools = db.relationship("Tool", back_populates="cost_center")
 
     def __repr__(self):
         return f"<CostCenter {self.name}>"
@@ -213,6 +214,9 @@ class Tool(db.Model):
     vendor_id = db.Column(db.Integer, db.ForeignKey("resources.id"),
                           nullable=True)
     vendor = db.relationship("Vendor", back_populates="tools")
+    cost_center_id = db.Column(db.Integer, db.ForeignKey("cost_centers.id"),
+                               nullable=True)
+    cost_center = db.relationship("CostCenter", back_populates="tools")
 
     # Budget projection fields
     category_id = db.Column(db.Integer, db.ForeignKey("tool_categories.id"), nullable=True)

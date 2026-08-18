@@ -40,9 +40,6 @@ class ServiceForm(FlaskForm):
 # ---------------------------------------------------------------------------
 class VendorForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
-    cost_center_id = SelectField(
-        "Cost Center", coerce=int, validators=[DataRequired()]
-    )
     notes = TextAreaField("Notes", validators=[Optional()])
     is_active = BooleanField("Active", default=True)
 
@@ -80,6 +77,9 @@ class ToolForm(FlaskForm):
     vendor_id = SelectField(
         "Vendor (optional)", coerce=int, validators=[Optional()]
     )
+    cost_center_id = SelectField(
+        "Cost Center (optional)", coerce=int, validators=[Optional()]
+    )
     category_id = SelectField(
         "Category (optional)", coerce=int, validators=[Optional()]
     )
@@ -107,7 +107,13 @@ class ToolForm(FlaskForm):
         ] + [
             (c.id, c.name) for c in ToolCategory.query.order_by(ToolCategory.sort_order, ToolCategory.name).all()
         ]
-
+        # Populate cost center choices dynamically
+        from .models import CostCenter
+        self.cost_center_id.choices = [
+            (0, "--- Unassigned ---")
+        ] + [
+            (c.id, c.name) for c in CostCenter.query.order_by(CostCenter.name).all()
+        ]
 
 class ToolCategoryForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])

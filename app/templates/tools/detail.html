@@ -44,6 +44,13 @@
           <span class="muted">Unassigned</span>
 {% endif %}
       </td></tr>
+      <tr><th>Cost Center</th><td>
+        {% if tool.cost_center %}
+          <span class="tag">{{ tool.cost_center.name }}</span>
+        {% else %}
+          <span class="muted">Unassigned</span>
+      {% endif %}
+      </td></tr>
       <tr><th>Cost Type</th><td>
         {% if tool.cost_type %}
           {% if tool.cost_type == "one_time" %}One-time (Capex){% elif tool.cost_type == "recurring_monthly" %}Recurring (Monthly){% elif tool.cost_type == "recurring_annual" %}Recurring (Annual){% else %}{{ tool.cost_type }}{% endif %}
@@ -86,3 +93,4 @@
 </div>
 {% endif %}
 {% endblock %}
+
