@@ -103,6 +103,14 @@ class Service(db.Model):
     __tablename__ = "services"
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    cost_drivers = db.Column(db.Text, nullable=True)
+    deliverables = db.Column(db.Text, nullable=True)
+    sort_order = db.Column(db.Integer, default=0)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     # Relationships
     tools = db.relationship("Tool", back_populates="service",
                             cascade="all, delete-orphan")
@@ -117,7 +125,6 @@ class Service(db.Model):
     @property
     def deliverable_list(self):
         return [x for x in (self.deliverables or "").splitlines() if x.strip()]
-
     def __repr__(self):
         return f"<Service {self.name}>"
 
@@ -133,7 +140,6 @@ class Resource(db.Model):
     linked to services uniformly via ResourceServiceLink.
     """
     __tablename__ = "resources"
-
     id = db.Column(db.Integer, primary_key=True)
     kind = db.Column(db.String(20), nullable=False)  # 'vendor' | 'contractor' | 'employee'
     name = db.Column(db.String(200), nullable=False)
@@ -200,7 +206,6 @@ class Employee(Resource):
 # ---------------------------------------------------------------------------
 class ToolCategory(db.Model):
     __tablename__ = "tool_categories"
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
