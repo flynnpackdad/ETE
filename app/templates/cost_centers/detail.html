@@ -30,6 +30,7 @@
       <tr><th>Vendors</th><td>{{ cc.vendors|length }}</td></tr>
       <tr><th>Contractors</th><td>{{ cc.contractors|length }}</td></tr>
       <tr><th>Employees</th><td>{{ cc.employees|length }}</td></tr>
+      <tr><th>All-Up Cost</th><td>${% if cc.all_up_cost %}{{ "{:,.2f}".format(cc.all_up_cost) }}{% else %}0.00{% endif %}</td></tr>
     </table>
   </div>
 </div>
